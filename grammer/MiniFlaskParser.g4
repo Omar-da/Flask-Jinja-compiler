@@ -1,50 +1,52 @@
 parser grammar MiniFlaskParser;
-options { tokenVocab=MiniFlaskLexer; }
+options { tokenVocab = MiniFlaskLexer; }
 
 // -----------------------------
 // Entry Rule
 // -----------------------------
-file : statement+ EOF ;
+file
+    : statement+ EOF
+    ;
 
 // -----------------------------
 // Statements
 // -----------------------------
 statement
-    : importStmt
-    | routeDef
-    | funcDef
-    | assign
-    | ifStmt
-    | returnStmt
-    | exprStmt
+    : importStmt         #FlaskImportStmt
+    | routeDef           #FlaskRouteDefStmt
+    | funcDef            #FlaskFuncDefStmt
+    | assign             #FlaskAssignStmt
+    | ifStmt             #FlaskIfStmt
+    | returnStmt         #FlaskReturnStmt
+    | exprStmt           #FlaskExprStmt
     ;
 
 // -----------------------------
 // Imports
 // -----------------------------
 importStmt
-    : IMPORT importNames NEWLINE
-    | FROM NAME IMPORT importNames NEWLINE
+    : IMPORT importNames NEWLINE                #FlaskImportNamesStmt
+    | FROM NAME IMPORT importNames NEWLINE      #FlaskFromImportStmt
     ;
 
 importNames
-    : NAME (COMMA NAME)*
+    : NAME (COMMA NAME)*                        #FlaskImportNameList
     ;
 
 // -----------------------------
 // Route Definition
 // -----------------------------
 routeDef
-    : AT APP DOT ROUTE LPAREN routeArgs? RPAREN funcDef
+    : AT APP DOT ROUTE LPAREN routeArgs? RPAREN funcDef  #FlaskRouteDefinition
     ;
 
 routeArgs
-    : routeArg (COMMA routeArg)*
+    : routeArg (COMMA routeArg)*                 #FlaskRouteArgsList
     ;
 
 routeArg
-    : STRING
-    | NAME EQUALS expr
+    : STRING                                     #FlaskRouteArgString
+    | NAME EQUALS expr                           #FlaskRouteArgKw
     ;
 
 // -----------------------------
@@ -52,86 +54,130 @@ routeArg
 // -----------------------------
 funcDef
     : DEF NAME LPAREN params? RPAREN COLON NEWLINE
-      INDENT statement* DEDENT
+      INDENT statement* DEDENT                    #FlaskFunctionDef
     ;
 
 // -----------------------------
 // Function Parameters
 // -----------------------------
 params
-    : param (COMMA param)*
+    : param (COMMA param)*                       #FlaskParamsList
     ;
 
 param
-    : simpleParam
-    | defaultParam
-    | typeAnnotatedParam
-    | typeAnnotatedDefaultParam
-    | starParam
-    | doubleStarParam
+    : simpleParam                                #FlaskParamSimple
+    | defaultParam                               #FlaskParamDefault
+    | typeAnnotatedParam                         #FlaskParamType
+    | typeAnnotatedDefaultParam                  #FlaskParamTypeDefault
+    | starParam                                  #FlaskParamStar
+    | doubleStarParam                            #FlaskParamDoubleStar
     ;
 
-simpleParam                : NAME ;
-defaultParam               : NAME EQUALS expr ;
-typeAnnotatedParam         : NAME COLON typeExpr ;
-typeAnnotatedDefaultParam  : NAME COLON typeExpr EQUALS expr ;
-starParam                  : STAR NAME ;
-doubleStarParam            : DOUBLESTAR NAME ;
+simpleParam                : NAME                             #FlaskSimpleParam ;
+defaultParam               : NAME EQUALS expr                  #FlaskDefaultParam ;
+typeAnnotatedParam         : NAME COLON typeExpr               #FlaskTypeAnnotatedParam ;
+typeAnnotatedDefaultParam  : NAME COLON typeExpr EQUALS expr   #FlaskTypeAnnotatedDefaultParam ;
+starParam                  : STAR NAME                         #FlaskStarParam ;
+doubleStarParam            : DOUBLESTAR NAME                   #FlaskDoubleStarParam ;
 
-typeExpr : NAME (DOT NAME)* ;
+typeExpr
+    : NAME (DOT NAME)*                            #FlaskTypeExpr
+    ;
 
 // -----------------------------
 // Assignment
 // -----------------------------
-assign : NAME EQUALS expr NEWLINE ;
+assign
+    : NAME EQUALS expr NEWLINE                     #FlaskAssignment
+    ;
 
 // -----------------------------
 // If Statement
 // -----------------------------
-ifStmt : IF expr COLON NEWLINE INDENT statement+ DEDENT ;
+ifStmt
+    : IF expr COLON NEWLINE
+      INDENT statement+ DEDENT                     #FlaskIfStatement
+    ;
 
 // -----------------------------
 // Return Statement
 // -----------------------------
-returnStmt : RETURN expr NEWLINE ;
+returnStmt
+    : RETURN expr NEWLINE                          #FlaskReturnStatement
+    ;
 
 // -----------------------------
 // Expression Statement
 // -----------------------------
-exprStmt : expr NEWLINE ;
+exprStmt
+    : expr NEWLINE                                 #FlaskExpressionStatement
+    ;
 
 // -----------------------------
 // Expressions
 // -----------------------------
-expr     : additive (EQEQ additive)? ;
-additive : primary (PLUS primary)* ;
-primary  : atom suffix* ;
-suffix   : DOT NAME | LBRACK expr RBRACK | LPAREN args? RPAREN ;
-args     : arg (COMMA arg)* ;
-arg      : NAME EQUALS expr | expr ;
+expr
+    : additive (EQEQ additive)?                    #FlaskEqualityExpr
+    ;
+
+additive
+    : primary (PLUS primary)*                      #FlaskAdditiveExpr
+    ;
+
+primary
+    : atom suffix*                                 #FlaskPrimaryExpr
+    ;
+
+suffix
+    : DOT NAME                                     #FlaskAttrAccess
+    | LBRACK expr RBRACK                           #FlaskIndexing
+    | LPAREN args? RPAREN                          #FlaskCallSuffix
+    ;
+
+// args and arg
+args
+    : arg (COMMA arg)*                             #FlaskArgsList
+    ;
+
+arg
+    : NAME EQUALS expr                             #FlaskKwArg
+    | expr                                         #FlaskPosArg
+    ;
 
 // -----------------------------
 // Atoms
 // -----------------------------
 atom
-    : NAME
-    | STRING
-    | NUMBER
-    | NONE
-    | TRUE
-    | FALSE
-    | listLiteral
-    | dictLiteral
-    | genExpr
-    | LPAREN expr RPAREN
+    : NAME                                         #FlaskAtomName
+    | STRING                                       #FlaskAtomString
+    | NUMBER                                       #FlaskAtomNumber
+    | NONE                                         #FlaskAtomNone
+    | TRUE                                         #FlaskAtomTrue
+    | FALSE                                        #FlaskAtomFalse
+    | listLiteral                                  #FlaskAtomList
+    | dictLiteral                                  #FlaskAtomDict
+    | genExpr                                      #FlaskAtomGenExpr
+    | LPAREN expr RPAREN                           #FlaskAtomParen
     ;
 
-// Lists
-listLiteral : LBRACK (expr (COMMA expr)*)? RBRACK ;
+// -----------------------------
+// Lists and dicts
+// -----------------------------
+listLiteral
+    : LBRACK (expr (COMMA expr)*)? RBRACK          #FlaskListLiteral
+    ;
 
-// Dictionaries
-dictLiteral : LBRACE (pair (COMMA pair)*)? RBRACE ;
-pair         : (STRING | NAME) COLON expr ;
+dictLiteral
+    : LBRACE (pair (COMMA pair)*)? RBRACE          #FlaskDictLiteral
+    ;
 
+pair
+    : (STRING | NAME) COLON expr                   #FlaskDictPair
+    ;
+
+// -----------------------------
 // Generator Expression
-genExpr : LPAREN NAME FOR NAME IN expr (IF expr)? RPAREN ;
+// -----------------------------
+genExpr
+    : LPAREN NAME FOR NAME IN expr (IF expr)? RPAREN #FlaskGeneratorExpr
+    ;
