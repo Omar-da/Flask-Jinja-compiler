@@ -1,0 +1,103 @@
+<style>
+/* global reset */
+* {
+  box-sizing: border-box;
+}
+
+/* layout hierarchy */
+.page .content > section {
+  padding: 24px;
+}
+
+/* adjacent sibling selector */
+section + section {
+  margin-top: 32px;
+}
+
+/* pseudo-class */
+nav ul li:hover {
+  background-color: var(--hover-color);
+}
+
+/* pseudo-element */
+nav ul li::before {
+  content: "→";
+  margin-right: 8px;
+}
+
+/* nested selectors */
+.card .details .price {
+  font-weight: bold;
+}
+
+/* css function */
+.card {
+  transform: translateX(-50%);
+  width: {{ card_width }}px;
+}
+
+/* css variable usage */
+.footer {
+  color: var(--footer-color);
+}
+
+/* fixed unit values */
+.sidebar {
+  width: 280px;
+}
+</style>
+
+<div class="page">
+  <header class="header">
+    <h1>{{ site_title }}</h1>
+
+    {% if show_nav %}
+      <nav>
+        <ul>
+          {% for link in navigation %}
+            <li>
+              <a href="{{ link.url }}">
+                {{ link.label }}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </nav>
+    {% endif %}
+  </header>
+
+  <main class="content">
+    {% if sections %}
+      {% for section in sections %}
+        <section>
+          {% if section.items %}
+            <div class="grid">
+              {% for item in section.items %}
+                <div class="card">
+                  <div class="details">
+                    <p class="name">{{ item.name }}</p>
+                    <p class="price">${{ item.price }}</p>
+                  </div>
+
+                  {% if item.tags %}
+                    <ul class="tags">
+                      {% for tag in item.tags %}
+                        <li>{{ tag }}</li>
+                      {% endfor %}
+                    </ul>
+                  {% endif %}
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </section>
+      {% endfor %}
+    {% endif %}
+  </main>
+
+  {% if show_footer %}
+    <footer class="footer">
+      <p>Copyright {{ year }}</p>
+    </footer>
+  {% endif %}
+</div>

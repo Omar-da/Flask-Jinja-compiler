@@ -1,0 +1,18 @@
+from flask import Flask, render_template
+
+app = Flask(__name__)
+
+@app.route("/even")
+def even():
+    numbers = [1, 2, 3, 4, 5, 6]
+    evens = (n for n in numbers if n == 0)
+    return render_template("even.html", evens=evens)
+
+@app.route("/stats")
+def stats():
+    data = {
+        "views": [10, 20, 30],
+        "active": True
+    }
+    total = data["views"][0] + data["views"][1]
+    return render_template("stats.html", total=total)

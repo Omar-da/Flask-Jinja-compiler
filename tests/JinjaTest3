@@ -1,0 +1,84 @@
+<style>
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Layout */
+.container {
+  width: {{ container_width }}px;
+  max-width: 100%;
+  margin: {{ container_margin_top }}px {{ container_margin_right }}% {{ container_margin_bottom }}px {{ container_margin_left }}%;
+  padding: 1em 2em;
+}
+
+/* Card component */
+.card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  transform: translateX(-50%) translateY({{ card_y_offset }}px);
+  box-shadow: 0 4px 8px rgba({{ shadow_r }}, {{ shadow_g }}, {{ shadow_b }}, 0.2), 0 8px 16px rgba(0, 0, 0, 0.1);
+  width: calc(50% - {{ card_gap }}px);
+  padding: 1rem 1.5rem;
+}
+
+/* Banner with gradient (no Jinja blocks) */
+.card .banner {
+  background: linear-gradient(
+    135deg,
+    #000,
+    {{ banner_color_dark }},
+    {{ banner_color_light }},
+    #fff
+  );
+  height: {{ banner_height }}vh;
+  border-radius: 8px;
+}
+
+/* Nested pseudo-class + pseudo-element */
+.card:hover .meta::before {
+  content: "★";
+  color: {{ star_color }};
+  font-size: 1.2em;
+}
+
+/* Text & spacing multi-values */
+.card .meta {
+  margin: 0 0 1em 0;
+  padding: 0.5em {{ meta_padding_horizontal }}px 0.5em {{ meta_padding_horizontal }}px;
+  font-size: {{ meta_font_size }}em;
+  line-height: {{ meta_line_height }}em;
+}
+
+/* Footer with percentages and units */
+footer {
+  display: flex;
+  justify-content: space-between;
+  padding: {{ footer_padding_top }}px {{ footer_padding_right }}% {{ footer_padding_bottom }}px {{ footer_padding_left }}%;
+  font-size: {{ footer_font_size }}rem;
+  color: {{ footer_color }};
+}
+
+/* Complex list styling */
+ul.tags li {
+  display: inline-block;
+  margin: 0 4px 8px 0;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background-color: {{ highlight_color }};
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+/* Function with multiple units */
+.progress-bar {
+  width: calc(100% - {{ sidebar_width }}px - 2em);
+  height: 1.5em;
+  border-radius: 0.75em;
+  transform: translateY({{ progress_offset }}%);
+}
+</style>

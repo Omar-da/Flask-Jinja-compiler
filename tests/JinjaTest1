@@ -1,0 +1,70 @@
+<style>
+/* base layout */
+.container {
+  display: block;
+  padding: 16px;
+}
+
+/* descendant selector */
+.container ul li {
+  list-style: none;
+  margin: 8px 0;
+}
+
+/* pseudo-class without attribute operators */
+a:hover {
+  text-decoration: underline;
+}
+
+/* pseudo-element */
+li::before {
+  content: "•";
+  margin-right: 6px;
+}
+
+/* function + unit */
+.card {
+  transform: translateX(-50%);
+  width: {{ base_width }}px;
+}
+
+/* css variable usage */
+.header {
+  color: var(--main-color);
+}
+
+/* numeric css value */
+.price {
+  font-size: 14px;
+}
+</style>
+
+<div class="container">
+  <h1>{{ title }}</h1>
+
+  {% if products %}
+    <ul>
+      {% for p in products %}
+        <li class="card">
+          <a href="/product/{{ p.id }}">
+            {{ p.name }}
+          </a>
+
+          <div class="price">
+            ${{ p.price }}
+          </div>
+
+          {% if p.on_sale %}
+            <div class="badge">SALE</div>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% if show_footer %}
+    <footer class="header">
+      <p>Total products: {{ total_count }}</p>
+    </footer>
+  {% endif %}
+</div>
