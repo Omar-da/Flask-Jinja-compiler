@@ -2,10 +2,7 @@ from flask import Flask, request, redirect, url_for, render_template
 
 app = Flask(__name__)
 
-products = [
-    {"id": 1, "name": "Phone"},
-    {"id": 2, "name": "Laptop"}
-]
+products = [{"id": 1, "name": "Phone"},{"id": 2, "name": "Laptop"}]
 
 @app.route("/")
 def index():
