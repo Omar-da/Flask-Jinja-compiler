@@ -4,6 +4,9 @@ import ast.flask.expr.*;
 import ast.flask.misc.*;
 import ast.flask.stmt.*;
 import ast.flask.*;
+import ast.flask.symbols.Symbol;
+import ast.flask.symbols.SymbolKind;
+import ast.flask.symbols.SymbolTable;
 import gen.grammers.MiniFlaskParser;
 import gen.grammers.MiniFlaskParserBaseVisitor;
 import org.antlr.v4.runtime.Token;
@@ -15,16 +18,32 @@ import java.util.List;
 
 public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
 
+    private final SymbolTable symbolTable;
+
+    public FlaskASTBuilder() {
+        this.symbolTable = new SymbolTable();
+    }
+
     @Override
     public FlaskASTNode visitFile(MiniFlaskParser.FileContext ctx) {
+        symbolTable.enterScope("global");
+        System.out.println("Entered global scope: " + symbolTable.getCurrentScope().getName());
+
         List<Stmt> statements = new ArrayList<>();
 
         for (MiniFlaskParser.StatementContext stmtCtx : ctx.statement()) {
             statements.add((Stmt) visit(stmtCtx));
         }
+
+        System.out.println("Global Scope Symbols: " + symbolTable.getCurrentScope().getSymbols().keySet());
+
+        symbolTable.exitScope();
+        System.out.println("Exited global scope. Current scope: " + symbolTable.getCurrentScope().getName());
+
         Token t = ctx.getStart();
         return new FileNodeFlask(statements, t.getLine(), t.getCharPositionInLine());
     }
+
 
 
     @Override
@@ -34,11 +53,35 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
 
     @Override
     public FlaskASTNode visitFlaskAssignment(MiniFlaskParser.FlaskAssignmentContext ctx) {
-        String varName = ctx.IDENT() != null ? ctx.IDENT().getText() : ctx.APP().getText();
-        Expr value = (Expr) visit(ctx.expr()); // visit expression
+
+        String varName = ctx.IDENT() != null
+                ? ctx.IDENT().getText()
+                : ctx.APP().getText();
+
         Token t = ctx.getStart();
-        return new AssignStmt(varName, value, t.getLine(), t.getCharPositionInLine());
+
+        Expr value = (Expr) visit(ctx.expr());
+
+        AssignStmt assignStmt = new AssignStmt(varName, value, t.getLine(), t.getCharPositionInLine());
+
+        Symbol existing = symbolTable.getCurrentScope().getSymbols().get(varName);
+        if (existing != null) {
+            System.out.println(
+                    "Variable '" + varName + "' already exists in current scope '" +
+                            symbolTable.getCurrentScope().getName() + "'. Skipping redefine."
+            );
+        } else {
+            Symbol symbol = new Symbol(varName, SymbolKind.VARIABLE, assignStmt, t.getLine(), t.getCharPositionInLine());
+            symbolTable.define(symbol);
+
+            System.out.println("Defined variable '" + varName + "' in scope '" +
+                    symbolTable.getCurrentScope().getName() + "'. Current symbols: " +
+                    symbolTable.getCurrentScope().getSymbols().keySet());
+        }
+
+        return assignStmt;
     }
+
 
     @Override
     public FlaskASTNode visitFlaskReturnStmt(MiniFlaskParser.FlaskReturnStmtContext ctx) {
@@ -52,30 +95,24 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
 
     @Override
     public FlaskASTNode visitFlaskEqualityExpr(MiniFlaskParser.FlaskEqualityExprContext ctx) {
-        // First additive expression (LHS)
         Expr left = (Expr) visit(ctx.additive(0));
 
-        // Check if there is a right-hand side for equality
         if (ctx.EQEQ() != null) {
             Expr right = (Expr) visit(ctx.additive(1));
             Token t = ctx.getStart();
             return new BinaryExpr(left, "==", right, t.getLine(), t.getCharPositionInLine());
         }
 
-        // If no EQEQ, just return the left additive expression
         return left;
     }
 
     @Override
     public FlaskASTNode visitFlaskAdditiveExpr(MiniFlaskParser.FlaskAdditiveExprContext ctx) {
-        // Start with the first primary
         Expr left = (Expr) visit(ctx.primary(0));
 
-        // If there are more terms, handle them
         for (int i = 1; i < ctx.primary().size(); i++) {
             Expr right = (Expr) visit(ctx.primary(i));
 
-            // PLUS token is always between primary nodes
             Token plusToken = (Token) ctx.getChild(2 * i - 1).getPayload();
 
             left = new BinaryExpr(left, "+", right, plusToken.getLine(), plusToken.getCharPositionInLine());
@@ -86,13 +123,9 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
 
     @Override
     public FlaskASTNode visitFlaskPrimaryExpr(MiniFlaskParser.FlaskPrimaryExprContext ctx) {
-        // Visit the base atom
         Expr base = (Expr) visit(ctx.atom());
 
-        // Visit all suffixes using ANTLR dispatch (no instanceof)
-        List<Expr> suffixes = ctx.suffix().stream()
-                .map(suf -> (Expr) visit(suf))  // ANTLR automatically calls the correct visitXXX
-                .toList();
+        List<Expr> suffixes = ctx.suffix().stream().map(suf -> (Expr) visit(suf)).toList();
 
         Token t = ctx.getStart();
         return new PrimaryExpr(base, suffixes, t.getLine(), t.getCharPositionInLine());
@@ -102,18 +135,15 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
     public FlaskASTNode visitFlaskAttrAccess(MiniFlaskParser.FlaskAttrAccessContext ctx) {
         String attrName = ctx.IDENT().getText();
         Token t = ctx.getStart();
-        // The target will be set later in PrimaryExpr
         return new AttrAccessExpr(attrName, t.getLine(), t.getCharPositionInLine());
     }
 
     @Override
     public FlaskASTNode visitFlaskIndexing(MiniFlaskParser.FlaskIndexingContext ctx) {
-        // Visit the index expression
         Expr index = (Expr) visit(ctx.expr());
 
         Token t = ctx.getStart();
 
-        // The target will be applied later in PrimaryExpr
         return new IndexExpr(index, t.getLine(), t.getCharPositionInLine());
     }
 
@@ -135,7 +165,6 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
     public FlaskASTNode visitFlaskArgsList(MiniFlaskParser.FlaskArgsListContext ctx) {
         List<ArgKw> argKws = new ArrayList<>();
 
-        // Visit each arg
         for (MiniFlaskParser.ArgContext aCtx : ctx.arg()) {
             argKws.add((ArgKw) visit(aCtx));
         }
@@ -160,56 +189,70 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
 
     @Override
     public FlaskASTNode visitFlaskGenExpr(MiniFlaskParser.FlaskGenExprContext ctx) {
-        // Just delegate to the actual generator expression visitor
         return visit(ctx.genExpr());
     }
 
     @Override
     public FlaskASTNode visitFlaskGeneratorExpr(MiniFlaskParser.FlaskGeneratorExprContext ctx) {
-        // Element expression (before FOR)
-        Expr element = (Expr) visit(ctx.expr(0));
 
-        // Variable name
+        symbolTable.enterScope("generator");
+        System.out.println("Entered generator scope: " + symbolTable.getCurrentScope().getName());
+
         String var = ctx.IDENT().getText();
+        Token t = ctx.getStart();
+        Symbol symbol = new Symbol(var, SymbolKind.VARIABLE, null, t.getLine(), t.getCharPositionInLine());
+        symbolTable.define(symbol);
 
-        // Iterable expression (after IN)
+        System.out.println("Defined generator variable '" + var + "' in scope '" +
+                symbolTable.getCurrentScope().getName() + "'. Current symbols: " +
+                symbolTable.getCurrentScope().getSymbols().keySet());
+
+
+        Expr element = (Expr) visit(ctx.expr(0));
         Expr iterable = (Expr) visit(ctx.expr(1));
-
-        // Optional condition (after IF)
         Expr condition = ctx.expr().size() > 2 ? (Expr) visit(ctx.expr(2)) : null;
 
-        Token t = ctx.getStart();
-        return new GenExpr(element, var, iterable, condition, t.getLine(), t.getCharPositionInLine());
+        GenExpr genExpr = new GenExpr(element, var, iterable, condition, t.getLine(), t.getCharPositionInLine());
+
+
+        symbolTable.exitScope();
+        System.out.println("Exited generator scope, back to: " + symbolTable.getCurrentScope().getName());
+
+        return genExpr;
     }
+
 
     @Override
     public FlaskASTNode visitFlaskAtomName(MiniFlaskParser.FlaskAtomNameContext ctx) {
+        String name = ctx.IDENT().getText();
         Token t = ctx.getStart();
-        return new NameExpr(
-                ctx.IDENT().getText(),
-                t.getLine(),
-                t.getCharPositionInLine()
-        );
+
+        Symbol symbol = symbolTable.resolve(name);
+
+        if (symbol == null) {
+            throw new RuntimeException(
+                    "Undefined variable '" + name + "' at line " +
+                            t.getLine() + ", column " + t.getCharPositionInLine()
+            );
+        }
+
+        System.out.println("Resolved variable '" + name + "' in scope '" +
+                symbolTable.getCurrentScope().getName() + "'. Symbol info: " + symbol);
+
+        return new NameExpr(name, t.getLine(), t.getCharPositionInLine());
     }
+
 
     @Override
     public FlaskASTNode visitFlaskAtomString(MiniFlaskParser.FlaskAtomStringContext ctx) {
         Token t = ctx.getStart();
-        return new LiteralExpr(
-                ctx.STRING().getText(),
-                t.getLine(),
-                t.getCharPositionInLine()
-        );
+        return new LiteralExpr(ctx.STRING().getText(), t.getLine(), t.getCharPositionInLine());
     }
 
     @Override
     public FlaskASTNode visitFlaskAtomNumber(MiniFlaskParser.FlaskAtomNumberContext ctx) {
         Token t = ctx.getStart();
-        return new LiteralExpr(
-                ctx.NUMBER().getText(),
-                t.getLine(),
-                t.getCharPositionInLine()
-        );
+        return new LiteralExpr(ctx.NUMBER().getText(), t.getLine(), t.getCharPositionInLine());
     }
 
     @Override
@@ -246,11 +289,7 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
         DictPairs pairsNode = (DictPairs) visit(ctx.dictLiteral());
 
         Token t = ctx.getStart();
-        return new DictExpr(
-                pairsNode.pairs,
-                t.getLine(),
-                t.getCharPositionInLine()
-        );
+        return new DictExpr(pairsNode.pairs, t.getLine(), t.getCharPositionInLine());
     }
 
     @Override
@@ -262,7 +301,6 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
     public FlaskASTNode visitFlaskListLiteral(MiniFlaskParser.FlaskListLiteralContext ctx) {
         List<Expr> elements = new ArrayList<>();
 
-        // expr() returns all expr occurrences inside the list
         for (MiniFlaskParser.ExprContext eCtx : ctx.expr()) {
             elements.add((Expr) visit(eCtx));
         }
@@ -299,42 +337,59 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
 
     @Override
     public FlaskASTNode visitFlaskImportNamesStmt(MiniFlaskParser.FlaskImportNamesStmtContext ctx) {
-
         ImportNames namesNode = (ImportNames) visit(ctx.importNames());
-
         Token t = ctx.getStart();
-        return new ImportStmt(
-                namesNode.names,
-                t.getLine(),
-                t.getCharPositionInLine()
-        );
+
+        for (String name : namesNode.names) {
+            if (symbolTable.getCurrentScope().resolve(name) != null && symbolTable.getCurrentScope().getSymbols().containsKey(name)) {
+                throw new RuntimeException(
+                        "Symbol '" + name + "' already defined in current scope at line " +
+                                t.getLine() + ", column " + t.getCharPositionInLine()
+                );
+            }
+            Symbol symbol = new Symbol(name, SymbolKind.VARIABLE, null,t.getLine(),t.getCharPositionInLine());
+            symbolTable.define(symbol);
+
+            System.out.println("Imported symbol '" + name + "' in scope '" +
+                    symbolTable.getCurrentScope().getName() + "'. Current symbols: " +
+                    symbolTable.getCurrentScope().getSymbols().keySet());
+        }
+
+        return new ImportStmt(namesNode.names, t.getLine(), t.getCharPositionInLine());
     }
 
     @Override
     public FlaskASTNode visitFlaskFromImportStmt(MiniFlaskParser.FlaskFromImportStmtContext ctx) {
-
         String module = ctx.IDENT().getText();
         ImportNames namesNode = (ImportNames) visit(ctx.importNames());
-
         Token t = ctx.getStart();
-        return new FromImportStmt(
-                module,
-                namesNode.names,
-                t.getLine(),
-                t.getCharPositionInLine()
-        );
+
+        for (String name : namesNode.names) {
+            if (symbolTable.getCurrentScope().resolve(name) != null &&
+                    symbolTable.getCurrentScope().getSymbols().containsKey(name)) {
+                throw new RuntimeException(
+                        "Symbol '" + name + "' already defined in current scope at line " +
+                                t.getLine() + ", column " + t.getCharPositionInLine()
+                );
+            }
+
+            Symbol symbol = new Symbol(name, SymbolKind.VARIABLE, null, t.getLine(), t.getCharPositionInLine());
+            symbolTable.define(symbol);
+
+            System.out.println("Imported symbol '" + name + "' in scope '" +
+                    symbolTable.getCurrentScope().getName() + "'. Current symbols: " +
+                    symbolTable.getCurrentScope().getSymbols().keySet());
+        }
+
+        return new FromImportStmt(module, namesNode.names, t.getLine(), t.getCharPositionInLine());
     }
 
     @Override
-    public FlaskASTNode visitFlaskImportNameList(
-            MiniFlaskParser.FlaskImportNameListContext ctx) {
-
+    public FlaskASTNode visitFlaskImportNameList(MiniFlaskParser.FlaskImportNameListContext ctx) {
         List<String> names = new ArrayList<>();
-
         for (TerminalNode id : ctx.IDENT()) {
             names.add(id.getText());
         }
-
         return new ImportNames(names);
     }
 
@@ -382,43 +437,56 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
         Expr value = (Expr) visit(ctx.expr());
         Token t = ctx.getStart();
 
-        return new RouteRouteArgKw(
-                name,
-                value,
-                t.getLine(),
-                t.getCharPositionInLine()
-        );
+        return new RouteRouteArgKw(name, value, t.getLine(), t.getCharPositionInLine());
     }
 
     @Override
     public FlaskASTNode visitFlaskFunctionDef(MiniFlaskParser.FlaskFunctionDefContext ctx) {
-
-        // function name
         String name = ctx.IDENT().getText();
+        Token t = ctx.getStart();
 
-        // parameters
+        if (symbolTable.getCurrentScope().resolve(name) != null && symbolTable.getCurrentScope().getSymbols().containsKey(name)) {
+            throw new RuntimeException(
+                    "Function '" + name + "' already defined in current scope at line " +
+                            t.getLine() + ", column " + t.getCharPositionInLine()
+            );
+        }
+
+        Symbol funcSymbol = new Symbol(name, SymbolKind.FUNCTION, null, t.getLine(), t.getCharPositionInLine());
+        symbolTable.define(funcSymbol);
+        System.out.println("Defined function '" + name + "' in scope '" +
+                symbolTable.getCurrentScope().getName() + "'. Current symbols: " +
+                symbolTable.getCurrentScope().getSymbols().keySet());
+
+        symbolTable.enterScope("function_" + name);
+        System.out.println("Entered function scope: " + symbolTable.getCurrentScope().getName());
+
         List<Param> params = new ArrayList<>();
         if (ctx.params() != null) {
             Params p = (Params) visit(ctx.params());
             params = p.params;
+
+            for (Param param : params) {
+                if (symbolTable.getCurrentScope().resolve(param.name) != null && symbolTable.getCurrentScope().getSymbols().containsKey(param.name)) {
+                    throw new RuntimeException(
+                            "Parameter '" + param.name + "' already defined in function '" + name +
+                                    "' at line " + t.getLine() + ", column " + t.getCharPositionInLine()
+                    );
+                }
+
+                Symbol paramSymbol = new Symbol(param.name, SymbolKind.VARIABLE, null, t.getLine(), t.getCharPositionInLine());
+                symbolTable.define(paramSymbol);
+                System.out.println("Defined parameter '" + param.name + "' in function '" + name +
+                        "'. Current symbols: " + symbolTable.getCurrentScope().getSymbols().keySet());
+            }
         }
 
-        // function body
         List<Stmt> body = new ArrayList<>();
         for (MiniFlaskParser.StatementContext stmtCtx : ctx.statement()) {
             body.add((Stmt) visit(stmtCtx));
         }
 
-        // source location
-        Token t = ctx.getStart();
-
-        return new FuncDefStmt(
-                name,
-                params,
-                body,
-                t.getLine(),
-                t.getCharPositionInLine()
-        );
+        return new FuncDefStmt(name, params, body, t.getLine(), t.getCharPositionInLine());
     }
 
     @Override
@@ -450,7 +518,6 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
     @Override
     public FlaskASTNode visitFlaskTypeAnnotatedParam(MiniFlaskParser.FlaskTypeAnnotatedParamContext ctx) {
         String name = ctx.IDENT().getText();
-        // You can store typeExpr as defaultValue or ignore it if Param doesn’t track type
         Expr defaultValue = null;
         Token t = ctx.getStart();
         return new Param(name, defaultValue, t.getLine(), t.getCharPositionInLine());
@@ -480,7 +547,6 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
 
     @Override
     public FlaskASTNode visitFlaskTypeExpr(MiniFlaskParser.FlaskTypeExprContext ctx) {
-        // Concatenate IDENT and DOT parts
         StringBuilder sb = new StringBuilder();
         sb.append(ctx.IDENT(0).getText());
         for (int i = 1; i < ctx.IDENT().size(); i++) {
@@ -495,16 +561,13 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
     public FlaskASTNode visitFlaskIfStatement(MiniFlaskParser.FlaskIfStatementContext ctx) {
         Token t = ctx.getStart();
 
-        // Visit the condition expression
         Expr condition = (Expr) visit(ctx.expr());
 
-        // Visit all statements in the body
         List<Stmt> body = new ArrayList<>();
         for (MiniFlaskParser.StatementContext sCtx : ctx.statement()) {
             body.add((Stmt) visit(sCtx));
         }
 
-        // Return the AST node
         return new IfStmt(condition, body, t.getLine(), t.getCharPositionInLine());
     }
 
@@ -520,6 +583,11 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
             }
         }
 
+        System.out.println("Exiting function scope: " +
+                symbolTable.getCurrentScope().getName() + ". Symbols in scope: " +
+                symbolTable.getCurrentScope().getSymbols().keySet());
+        symbolTable.exitScope();
+
         return new ReturnStmt(value, t.getLine(), t.getCharPositionInLine());
     }
 
@@ -527,10 +595,8 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
     public FlaskASTNode visitFlaskExpressionStatement(MiniFlaskParser.FlaskExpressionStatementContext ctx) {
         Token t = ctx.getStart();
 
-        // Visit the expression
         Expr expr = (Expr) visit(ctx.expr());
 
-        // Wrap it in ExprStmt
         return new ExprStmt(expr, t.getLine(), t.getCharPositionInLine());
     }
 
