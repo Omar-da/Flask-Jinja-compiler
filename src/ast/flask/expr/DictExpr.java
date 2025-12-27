@@ -1,12 +1,23 @@
 package ast.flask.expr;
 
+import ast.flask.misc.DictPair;
+
 import java.util.List;
 
 public class DictExpr extends Expr {
-    public final List<DictEntry> entries;
+    public final List<DictPair> pairs;
 
-    public DictExpr(List<DictEntry> entries, int line, int column) {
+    public DictExpr(List<DictPair> pairs, int line, int column) {
         super(line, column);
-        this.entries = entries;
+        this.pairs = pairs;
+    }
+
+    @Override
+    public String toString() {
+        return "DictExpr{" +
+                "pairs=" + pairs +
+                ", line=" + line +
+                ", column=" + column +
+                '}';
     }
 }

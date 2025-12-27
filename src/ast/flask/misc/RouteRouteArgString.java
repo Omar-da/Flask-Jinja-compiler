@@ -1,0 +1,21 @@
+package ast.flask.misc;
+
+import ast.flask.expr.Expr;
+
+public class RouteRouteArgString extends Expr implements RouteArg {
+    public final String path;
+
+    public RouteRouteArgString(String path, int line, int column) {
+        super(line, column);
+        this.path = path;
+    }
+
+    @Override
+    public String toString() {
+        return "ArgString{" +
+                "path='" + path + '\'' +
+                ", line=" + line +
+                ", column=" + column +
+                '}';
+    }
+}

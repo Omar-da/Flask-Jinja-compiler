@@ -1,178 +1,537 @@
 package ast.flask.builder;
 
 import ast.flask.expr.*;
+import ast.flask.misc.*;
 import ast.flask.stmt.*;
 import ast.flask.*;
 import gen.grammers.MiniFlaskParser;
 import gen.grammers.MiniFlaskParserBaseVisitor;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<ASTNode> {
-
-    /* ---------------- FILE ---------------- */
+public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
 
     @Override
-    public ASTNode visitFile(MiniFlaskParser.FileContext ctx) {
+    public FlaskASTNode visitFile(MiniFlaskParser.FileContext ctx) {
         List<Stmt> statements = new ArrayList<>();
 
         for (MiniFlaskParser.StatementContext stmtCtx : ctx.statement()) {
             statements.add((Stmt) visit(stmtCtx));
         }
-
-        return new FileNode(statements);
+        Token t = ctx.getStart();
+        return new FileNodeFlask(statements, t.getLine(), t.getCharPositionInLine());
     }
 
-    /* ---------------- STATEMENTS ---------------- */
 
     @Override
-    public ASTNode visitFlaskAssignStmt(MiniFlaskParser.FlaskAssignStmtContext ctx) {
-        String name = ctx.IDENT().getText();
-        Expr value = (Expr) visit(ctx.expr());
-        return new AssignStmt(name, value);
+    public FlaskASTNode visitFlaskAssignStmt(MiniFlaskParser.FlaskAssignStmtContext ctx) {
+        return visit(ctx.assign());
     }
 
     @Override
-    public ASTNode visitFlaskReturnStmt(MiniFlaskParser.FlaskReturnStmtContext ctx) {
-        return new ReturnStmt((Expr) visit(ctx.expr()));
+    public FlaskASTNode visitFlaskAssignment(MiniFlaskParser.FlaskAssignmentContext ctx) {
+        String varName = ctx.IDENT() != null ? ctx.IDENT().getText() : ctx.APP().getText();
+        Expr value = (Expr) visit(ctx.expr()); // visit expression
+        Token t = ctx.getStart();
+        return new AssignStmt(varName, value, t.getLine(), t.getCharPositionInLine());
     }
 
     @Override
-    public ASTNode visitFlaskExprStmt(MiniFlaskParser.FlaskExprStmtContext ctx) {
-        return new ExprStmt((Expr) visit(ctx.expr()));
+    public FlaskASTNode visitFlaskReturnStmt(MiniFlaskParser.FlaskReturnStmtContext ctx) {
+        return visit(ctx.returnStmt());
     }
 
-    /* ---------------- EXPRESSIONS ---------------- */
+    @Override
+    public FlaskASTNode visitFlaskExprStmt(MiniFlaskParser.FlaskExprStmtContext ctx) {
+        return visit(ctx.getChild(0));
+    }
 
     @Override
-    public ASTNode visitFlaskEqualityExpr(MiniFlaskParser.FlaskEqualityExprContext ctx) {
+    public FlaskASTNode visitFlaskEqualityExpr(MiniFlaskParser.FlaskEqualityExprContext ctx) {
+        // First additive expression (LHS)
         Expr left = (Expr) visit(ctx.additive(0));
 
-        if (ctx.additive().size() == 1) {
-            return left;
+        // Check if there is a right-hand side for equality
+        if (ctx.EQEQ() != null) {
+            Expr right = (Expr) visit(ctx.additive(1));
+            Token t = ctx.getStart();
+            return new BinaryExpr(left, "==", right, t.getLine(), t.getCharPositionInLine());
         }
 
-        Expr right = (Expr) visit(ctx.additive(1));
-        return new BinaryExpr(left, "==", right);
+        // If no EQEQ, just return the left additive expression
+        return left;
     }
 
     @Override
-    public ASTNode visitFlaskAdditiveExpr(MiniFlaskParser.FlaskAdditiveExprContext ctx) {
-        Expr expr = (Expr) visit(ctx.primary(0));
+    public FlaskASTNode visitFlaskAdditiveExpr(MiniFlaskParser.FlaskAdditiveExprContext ctx) {
+        // Start with the first primary
+        Expr left = (Expr) visit(ctx.primary(0));
 
+        // If there are more terms, handle them
         for (int i = 1; i < ctx.primary().size(); i++) {
             Expr right = (Expr) visit(ctx.primary(i));
-            expr = new BinaryExpr(expr, "+", right);
+
+            // PLUS token is always between primary nodes
+            Token plusToken = (Token) ctx.getChild(2 * i - 1).getPayload();
+
+            left = new BinaryExpr(left, "+", right, plusToken.getLine(), plusToken.getCharPositionInLine());
         }
 
-        return expr;
+        return left;
     }
 
-    /* ---------------- PRIMARY + SUFFIX ---------------- */
+    @Override
+    public FlaskASTNode visitFlaskPrimaryExpr(MiniFlaskParser.FlaskPrimaryExprContext ctx) {
+        // Visit the base atom
+        Expr base = (Expr) visit(ctx.atom());
+
+        // Visit all suffixes using ANTLR dispatch (no instanceof)
+        List<Expr> suffixes = ctx.suffix().stream()
+                .map(suf -> (Expr) visit(suf))  // ANTLR automatically calls the correct visitXXX
+                .toList();
+
+        Token t = ctx.getStart();
+        return new PrimaryExpr(base, suffixes, t.getLine(), t.getCharPositionInLine());
+    }
 
     @Override
-    public ASTNode visitFlaskPrimaryExpr(MiniFlaskParser.FlaskPrimaryExprContext ctx) {
-        Expr expr = (Expr) visit(ctx.atom());
+    public FlaskASTNode visitFlaskAttrAccess(MiniFlaskParser.FlaskAttrAccessContext ctx) {
+        String attrName = ctx.IDENT().getText();
+        Token t = ctx.getStart();
+        // The target will be set later in PrimaryExpr
+        return new AttrAccessExpr(attrName, t.getLine(), t.getCharPositionInLine());
+    }
 
-        for (MiniFlaskParser.SuffixContext s : ctx.suffix()) {
-            expr = applySuffix(expr, s);
+    @Override
+    public FlaskASTNode visitFlaskIndexing(MiniFlaskParser.FlaskIndexingContext ctx) {
+        // Visit the index expression
+        Expr index = (Expr) visit(ctx.expr());
+
+        Token t = ctx.getStart();
+
+        // The target will be applied later in PrimaryExpr
+        return new IndexExpr(index, t.getLine(), t.getCharPositionInLine());
+    }
+
+
+    @Override
+    public FlaskASTNode visitFlaskCallSuffix(MiniFlaskParser.FlaskCallSuffixContext ctx) {
+        List<ArgKw> argKws = new ArrayList<>();
+
+        if (ctx.args() != null) {
+            Args argsNode = (Args) visit(ctx.args());
+            argKws.addAll(argsNode.argKws);
         }
 
-        return expr;
+        Token t = ctx.getStart();
+        return new CallExpr(argKws, t.getLine(), t.getCharPositionInLine());
     }
 
-    private Expr applySuffix(Expr target, MiniFlaskParser.SuffixContext ctx) {
+    @Override
+    public FlaskASTNode visitFlaskArgsList(MiniFlaskParser.FlaskArgsListContext ctx) {
+        List<ArgKw> argKws = new ArrayList<>();
 
-        if (ctx.DOT() != null) {
-            return new AttrAccessExpr(target, ctx.IDENT().getText());
+        // Visit each arg
+        for (MiniFlaskParser.ArgContext aCtx : ctx.arg()) {
+            argKws.add((ArgKw) visit(aCtx));
         }
-
-        if (ctx.LBRACK() != null) {
-            Expr index = (Expr) visit(ctx.expr());
-            return new IndexExpr(target, index);
-        }
-
-        if (ctx.LPAREN() != null) {
-            List<Expr> args = new ArrayList<>();
-            if (ctx.args() != null) {
-                for (MiniFlaskParser.ArgContext a : ctx.args().arg()) {
-                    args.add((Expr) visit(a));
-                }
-            }
-            return new CallExpr(target, args);
-        }
-
-        return target;
-    }
-
-    /* ---------------- ATOMS ---------------- */
-
-    @Override
-    public ASTNode visitFlaskAtomName(MiniFlaskParser.FlaskAtomNameContext ctx) {
-        return new NameExpr(ctx.IDENT().getText());
+        Token t = ctx.getStart();
+        return new Args(argKws, t.getLine(), t.getCharPositionInLine());
     }
 
     @Override
-    public ASTNode visitFlaskAtomString(MiniFlaskParser.FlaskAtomStringContext ctx) {
-        return new LiteralExpr(ctx.STRING().getText());
+    public FlaskASTNode visitFlaskKwArg(MiniFlaskParser.FlaskKwArgContext ctx) {
+        String name = ctx.IDENT().getText();
+        Expr value = (Expr) visit(ctx.expr());
+        Token t = ctx.getStart();
+        return new ArgKw(name, value, t.getLine(), t.getCharPositionInLine());
     }
 
     @Override
-    public ASTNode visitFlaskAtomNumber(MiniFlaskParser.FlaskAtomNumberContext ctx) {
-        return new LiteralExpr(Integer.parseInt(ctx.NUMBER().getText()));
+    public FlaskASTNode visitFlaskPosArg(MiniFlaskParser.FlaskPosArgContext ctx) {
+        Expr value = (Expr) visit(ctx.expr());
+        Token t = ctx.getStart();
+        return new ArgKw(null, value, t.getLine(), t.getCharPositionInLine());
     }
 
     @Override
-    public ASTNode visitFlaskAtomTrue(MiniFlaskParser.FlaskAtomTrueContext ctx) {
-        return new LiteralExpr(true);
+    public FlaskASTNode visitFlaskGenExpr(MiniFlaskParser.FlaskGenExprContext ctx) {
+        // Just delegate to the actual generator expression visitor
+        return visit(ctx.genExpr());
     }
 
     @Override
-    public ASTNode visitFlaskAtomFalse(MiniFlaskParser.FlaskAtomFalseContext ctx) {
-        return new LiteralExpr(false);
+    public FlaskASTNode visitFlaskGeneratorExpr(MiniFlaskParser.FlaskGeneratorExprContext ctx) {
+        // Element expression (before FOR)
+        Expr element = (Expr) visit(ctx.expr(0));
+
+        // Variable name
+        String var = ctx.IDENT().getText();
+
+        // Iterable expression (after IN)
+        Expr iterable = (Expr) visit(ctx.expr(1));
+
+        // Optional condition (after IF)
+        Expr condition = ctx.expr().size() > 2 ? (Expr) visit(ctx.expr(2)) : null;
+
+        Token t = ctx.getStart();
+        return new GenExpr(element, var, iterable, condition, t.getLine(), t.getCharPositionInLine());
     }
 
     @Override
-    public ASTNode visitFlaskAtomNone(MiniFlaskParser.FlaskAtomNoneContext ctx) {
-        return new LiteralExpr(null);
+    public FlaskASTNode visitFlaskAtomName(MiniFlaskParser.FlaskAtomNameContext ctx) {
+        Token t = ctx.getStart();
+        return new NameExpr(
+                ctx.IDENT().getText(),
+                t.getLine(),
+                t.getCharPositionInLine()
+        );
     }
 
-    /* ---------------- COLLECTIONS ---------------- */
+    @Override
+    public FlaskASTNode visitFlaskAtomString(MiniFlaskParser.FlaskAtomStringContext ctx) {
+        Token t = ctx.getStart();
+        return new LiteralExpr(
+                ctx.STRING().getText(),
+                t.getLine(),
+                t.getCharPositionInLine()
+        );
+    }
 
     @Override
-    public ASTNode visitFlaskListLiteral(MiniFlaskParser.FlaskListLiteralContext ctx) {
+    public FlaskASTNode visitFlaskAtomNumber(MiniFlaskParser.FlaskAtomNumberContext ctx) {
+        Token t = ctx.getStart();
+        return new LiteralExpr(
+                ctx.NUMBER().getText(),
+                t.getLine(),
+                t.getCharPositionInLine()
+        );
+    }
+
+    @Override
+    public FlaskASTNode visitFlskAtomApp(MiniFlaskParser.FlskAtomAppContext ctx) {
+        Token t = ctx.getStart();
+        return new AppExpr(t.getLine(), t.getCharPositionInLine());
+    }
+
+    @Override
+    public FlaskASTNode visitFlaskAtomNone(MiniFlaskParser.FlaskAtomNoneContext ctx) {
+        Token t = ctx.getStart();
+        return new NoneExpr(t.getLine(), t.getCharPositionInLine());
+    }
+
+    @Override
+    public FlaskASTNode visitFlaskAtomTrue(MiniFlaskParser.FlaskAtomTrueContext ctx) {
+        Token t = ctx.getStart();
+        return new BoolExpr(true, t.getLine(), t.getCharPositionInLine());
+    }
+
+    @Override
+    public FlaskASTNode visitFlaskAtomFalse(MiniFlaskParser.FlaskAtomFalseContext ctx) {
+        Token t = ctx.getStart();
+        return new BoolExpr(false, t.getLine(), t.getCharPositionInLine());
+    }
+
+    @Override
+    public FlaskASTNode visitFlaskAtomList(MiniFlaskParser.FlaskAtomListContext ctx) {
+        return visit(ctx.listLiteral());
+    }
+
+    @Override
+    public FlaskASTNode visitFlaskAtomDict(MiniFlaskParser.FlaskAtomDictContext ctx) {
+        DictPairs pairsNode = (DictPairs) visit(ctx.dictLiteral());
+
+        Token t = ctx.getStart();
+        return new DictExpr(
+                pairsNode.pairs,
+                t.getLine(),
+                t.getCharPositionInLine()
+        );
+    }
+
+    @Override
+    public FlaskASTNode visitFlaskAtomGenExpr(MiniFlaskParser.FlaskAtomGenExprContext ctx) {
+        return visit(ctx.genExpr());
+    }
+
+    @Override
+    public FlaskASTNode visitFlaskListLiteral(MiniFlaskParser.FlaskListLiteralContext ctx) {
         List<Expr> elements = new ArrayList<>();
 
-        for (MiniFlaskParser.ExprContext e : ctx.expr()) {
-            elements.add((Expr) visit(e));
+        // expr() returns all expr occurrences inside the list
+        for (MiniFlaskParser.ExprContext eCtx : ctx.expr()) {
+            elements.add((Expr) visit(eCtx));
         }
 
-        return new ListExpr(elements);
+        Token t = ctx.getStart();
+        return new ListExpr(elements, t.getLine(), t.getCharPositionInLine());
     }
 
     @Override
-    public ASTNode visitFlaskDictLiteral(MiniFlaskParser.FlaskDictLiteralContext ctx) {
-        List<DictExpr.Pair> pairs = new ArrayList<>();
+    public FlaskASTNode visitFlaskDictLiteral(MiniFlaskParser.FlaskDictLiteralContext ctx) {
+        List<DictPair> pairs = new ArrayList<>();
 
-        for (MiniFlaskParser.PairContext p : ctx.pair()) {
-            String key = p.getChild(0).getText();
-            Expr value = (Expr) visit(p.expr());
-            pairs.add(new DictExpr.Pair(key, value));
+        for (MiniFlaskParser.PairContext pCtx : ctx.pair()) {
+            pairs.add((DictPair) visit(pCtx));
         }
 
-        return new DictExpr(pairs);
+        Token t = ctx.getStart();
+        return new DictPairs(pairs, t.getLine(), t.getCharPositionInLine());
     }
-
-    /* ---------------- GENERATOR ---------------- */
 
     @Override
-    public ASTNode visitFlaskGeneratorExpr(MiniFlaskParser.FlaskGeneratorExprContext ctx) {
-        Expr element = (Expr) visit(ctx.expr(0));
-        String var = ctx.IDENT().getText();
-        Expr iterable = (Expr) visit(ctx.expr(1));
-        Expr condition = ctx.expr().size() == 3 ? (Expr) visit(ctx.expr(2)) : null;
+    public FlaskASTNode visitFlaskDictPair(MiniFlaskParser.FlaskDictPairContext ctx) {
+        String key;
 
-        return new GeneratorExpr(element, var, iterable, condition);
+        if (ctx.STRING() != null) {
+            key = ctx.STRING().getText();
+        } else {
+            key = ctx.IDENT().getText();
+        }
+
+        Expr value = (Expr) visit(ctx.expr());
+        return new DictPair(key, value);
     }
+
+    @Override
+    public FlaskASTNode visitFlaskImportNamesStmt(MiniFlaskParser.FlaskImportNamesStmtContext ctx) {
+
+        ImportNames namesNode = (ImportNames) visit(ctx.importNames());
+
+        Token t = ctx.getStart();
+        return new ImportStmt(
+                namesNode.names,
+                t.getLine(),
+                t.getCharPositionInLine()
+        );
+    }
+
+    @Override
+    public FlaskASTNode visitFlaskFromImportStmt(MiniFlaskParser.FlaskFromImportStmtContext ctx) {
+
+        String module = ctx.IDENT().getText();
+        ImportNames namesNode = (ImportNames) visit(ctx.importNames());
+
+        Token t = ctx.getStart();
+        return new FromImportStmt(
+                module,
+                namesNode.names,
+                t.getLine(),
+                t.getCharPositionInLine()
+        );
+    }
+
+    @Override
+    public FlaskASTNode visitFlaskImportNameList(
+            MiniFlaskParser.FlaskImportNameListContext ctx) {
+
+        List<String> names = new ArrayList<>();
+
+        for (TerminalNode id : ctx.IDENT()) {
+            names.add(id.getText());
+        }
+
+        return new ImportNames(names);
+    }
+
+
+    @Override
+    public FlaskASTNode visitFlaskRouteDefinition(MiniFlaskParser.FlaskRouteDefinitionContext ctx) {
+        Token t = ctx.getStart();
+
+        List<RouteArg> routeArgs = new ArrayList<>();
+        if (ctx.routeArgs() != null) {
+            RouteArgs routeArgsNode = (RouteArgs) visit(ctx.routeArgs());
+            routeArgs.addAll(routeArgsNode.routeArgs);
+        }
+
+        FuncDefStmt function = (FuncDefStmt) visit(ctx.funcDef());
+
+        return new RouteDefStmt(routeArgs, function, t.getLine(), t.getCharPositionInLine());
+    }
+
+    @Override
+    public FlaskASTNode visitFlaskRouteArgsList(MiniFlaskParser.FlaskRouteArgsListContext ctx) {
+
+        List<RouteArg> routeArgs = new ArrayList<>();
+
+        for (MiniFlaskParser.RouteArgContext a : ctx.routeArg()) {
+            routeArgs.add((RouteArg) visit(a));
+        }
+        Token t = ctx.getStart();
+        return new RouteArgs(routeArgs, t.getLine(), t.getCharPositionInLine());
+    }
+
+    @Override
+    public FlaskASTNode visitFlaskRouteArgString(MiniFlaskParser.FlaskRouteArgStringContext ctx) {
+        Token t = ctx.getStart();
+        String raw = ctx.STRING().getText();
+        String path = raw.substring(1, raw.length() - 1);
+        return new RouteRouteArgString(path, t.getLine(), t.getCharPositionInLine());
+    }
+
+
+    @Override
+    public FlaskASTNode visitFlaskRouteArgKw(MiniFlaskParser.FlaskRouteArgKwContext ctx) {
+
+        String name = ctx.IDENT().getText();
+        Expr value = (Expr) visit(ctx.expr());
+        Token t = ctx.getStart();
+
+        return new RouteRouteArgKw(
+                name,
+                value,
+                t.getLine(),
+                t.getCharPositionInLine()
+        );
+    }
+
+    @Override
+    public FlaskASTNode visitFlaskFunctionDef(MiniFlaskParser.FlaskFunctionDefContext ctx) {
+
+        // function name
+        String name = ctx.IDENT().getText();
+
+        // parameters
+        List<Param> params = new ArrayList<>();
+        if (ctx.params() != null) {
+            Params p = (Params) visit(ctx.params());
+            params = p.params;
+        }
+
+        // function body
+        List<Stmt> body = new ArrayList<>();
+        for (MiniFlaskParser.StatementContext stmtCtx : ctx.statement()) {
+            body.add((Stmt) visit(stmtCtx));
+        }
+
+        // source location
+        Token t = ctx.getStart();
+
+        return new FuncDefStmt(
+                name,
+                params,
+                body,
+                t.getLine(),
+                t.getCharPositionInLine()
+        );
+    }
+
+    @Override
+    public FlaskASTNode visitFlaskParamsList(MiniFlaskParser.FlaskParamsListContext ctx) {
+        List<Param> params = new ArrayList<>();
+
+        for (MiniFlaskParser.ParamContext p : ctx.param()) {
+            params.add((Param) visit(p));
+        }
+
+        return new Params(params);
+    }
+
+    @Override
+    public FlaskASTNode visitFlaskSimpleParam(MiniFlaskParser.FlaskSimpleParamContext ctx) {
+        String name = ctx.IDENT().getText();
+        Token t = ctx.getStart();
+        return new Param(name, null, t.getLine(), t.getCharPositionInLine());
+    }
+
+    @Override
+    public FlaskASTNode visitFlaskDefaultParam(MiniFlaskParser.FlaskDefaultParamContext ctx) {
+        String name = ctx.IDENT().getText();
+        Expr defaultValue = (Expr) visit(ctx.expr());
+        Token t = ctx.getStart();
+        return new Param(name, defaultValue, t.getLine(), t.getCharPositionInLine());
+    }
+
+    @Override
+    public FlaskASTNode visitFlaskTypeAnnotatedParam(MiniFlaskParser.FlaskTypeAnnotatedParamContext ctx) {
+        String name = ctx.IDENT().getText();
+        // You can store typeExpr as defaultValue or ignore it if Param doesn’t track type
+        Expr defaultValue = null;
+        Token t = ctx.getStart();
+        return new Param(name, defaultValue, t.getLine(), t.getCharPositionInLine());
+    }
+
+    @Override
+    public FlaskASTNode visitFlaskTypeAnnotatedDefaultParam(MiniFlaskParser.FlaskTypeAnnotatedDefaultParamContext ctx) {
+        String name = ctx.IDENT().getText();
+        Expr defaultValue = (Expr) visit(ctx.expr());
+        Token t = ctx.getStart();
+        return new Param(name, defaultValue, t.getLine(), t.getCharPositionInLine());
+    }
+
+    @Override
+    public FlaskASTNode visitFlaskStarParam(MiniFlaskParser.FlaskStarParamContext ctx) {
+        String name = "*" + ctx.IDENT().getText(); // encode star in name
+        Token t = ctx.getStart();
+        return new Param(name, null, t.getLine(), t.getCharPositionInLine());
+    }
+
+    @Override
+    public FlaskASTNode visitFlaskDoubleStarParam(MiniFlaskParser.FlaskDoubleStarParamContext ctx) {
+        String name = "**" + ctx.IDENT().getText(); // encode double star
+        Token t = ctx.getStart();
+        return new Param(name, null, t.getLine(), t.getCharPositionInLine());
+    }
+
+    @Override
+    public FlaskASTNode visitFlaskTypeExpr(MiniFlaskParser.FlaskTypeExprContext ctx) {
+        // Concatenate IDENT and DOT parts
+        StringBuilder sb = new StringBuilder();
+        sb.append(ctx.IDENT(0).getText());
+        for (int i = 1; i < ctx.IDENT().size(); i++) {
+            sb.append(".").append(ctx.IDENT(i).getText());
+        }
+
+        Token t = ctx.getStart();
+        return new TypeExpr(sb.toString(), t.getLine(), t.getCharPositionInLine());
+    }
+
+    @Override
+    public FlaskASTNode visitFlaskIfStatement(MiniFlaskParser.FlaskIfStatementContext ctx) {
+        Token t = ctx.getStart();
+
+        // Visit the condition expression
+        Expr condition = (Expr) visit(ctx.expr());
+
+        // Visit all statements in the body
+        List<Stmt> body = new ArrayList<>();
+        for (MiniFlaskParser.StatementContext sCtx : ctx.statement()) {
+            body.add((Stmt) visit(sCtx));
+        }
+
+        // Return the AST node
+        return new IfStmt(condition, body, t.getLine(), t.getCharPositionInLine());
+    }
+
+    @Override
+    public FlaskASTNode visitFlaskReturnStatement(MiniFlaskParser.FlaskReturnStatementContext ctx) {
+        Token t = ctx.getStart();
+
+        Expr value = null;
+        for (ParseTree child : ctx.children) {
+            if (child instanceof MiniFlaskParser.FlaskEqualityExprContext) {
+                value = (Expr) visit(child);
+                break;
+            }
+        }
+
+        return new ReturnStmt(value, t.getLine(), t.getCharPositionInLine());
+    }
+
+    @Override
+    public FlaskASTNode visitFlaskExpressionStatement(MiniFlaskParser.FlaskExpressionStatementContext ctx) {
+        Token t = ctx.getStart();
+
+        // Visit the expression
+        Expr expr = (Expr) visit(ctx.expr());
+
+        // Wrap it in ExprStmt
+        return new ExprStmt(expr, t.getLine(), t.getCharPositionInLine());
+    }
+
 }

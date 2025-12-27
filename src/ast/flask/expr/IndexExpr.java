@@ -1,12 +1,19 @@
 package ast.flask.expr;
 
 public class IndexExpr extends Expr {
-    public final Expr target;
     public final Expr index;
 
-    public IndexExpr(Expr target, Expr index, int line, int column) {
+    public IndexExpr(Expr index, int line, int column) {
         super(line, column);
-        this.target = target;
         this.index = index;
+    }
+
+    @Override
+    public String toString() {
+        return "IndexExpr{" +
+                "line=" + line +
+                ", column=" + column +
+                ", index=" + index +
+                '}';
     }
 }

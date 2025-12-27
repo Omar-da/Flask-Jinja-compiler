@@ -1,0 +1,19 @@
+package ast.flask.expr;
+
+public class TypeExpr extends Expr {
+    public final String name;
+
+    public TypeExpr(String name, int line, int column) {
+        super(line, column);
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "TypeExpr{" +
+                "name='" + name + '\'' +
+                ", line=" + line +
+                ", column=" + column +
+                '}';
+    }
+}

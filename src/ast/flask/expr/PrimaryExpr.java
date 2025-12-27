@@ -11,4 +11,15 @@ public class PrimaryExpr extends Expr {
         this.base = base;
         this.suffixes = suffixes;
     }
+
+    @Override
+    public String toString() {
+        return "PrimaryExpr{" +
+                "line=" + line +
+                ", column=" + column +
+                ", base=" + base +
+                ", suffixes=" + suffixes +
+                '}';
+    }
+
 }

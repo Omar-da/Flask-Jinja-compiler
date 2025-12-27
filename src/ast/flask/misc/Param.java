@@ -1,9 +1,9 @@
 package ast.flask.misc;
 
-import ast.flask.ASTNode;
+import ast.flask.FlaskASTNode;
 import ast.flask.expr.Expr;
 
-public class Param extends ASTNode {
+public class Param extends FlaskASTNode {
     public final String name;
     public final Expr defaultValue;
 
@@ -11,5 +11,15 @@ public class Param extends ASTNode {
         super(line, column);
         this.name = name;
         this.defaultValue = defaultValue;
+    }
+
+    @Override
+    public String toString() {
+        return "Param{" +
+                "name='" + name + '\'' +
+                ", defaultValue=" + defaultValue +
+                ", line=" + line +
+                ", column=" + column +
+                '}';
     }
 }

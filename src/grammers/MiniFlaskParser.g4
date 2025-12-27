@@ -98,11 +98,11 @@ primary
 suffix
     : DOT IDENT                                 #FlaskAttrAccess
     | LBRACK expr RBRACK                        #FlaskIndexing
-    | LPAREN NEWLINE* args? NEWLINE* RPAREN     #FlaskCallSuffix
+    | LPAREN NEWLINE* routeArgKws? NEWLINE* RPAREN     #FlaskCallSuffix
     | genExpr                                   #FlaskGenExpr
     ;
 
-args
+routeArgKws
     : arg (NEWLINE* COMMA NEWLINE* arg)*        #FlaskArgsList
     ;
 

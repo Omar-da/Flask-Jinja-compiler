@@ -1,15 +1,24 @@
 package ast.flask.expr;
 
-import ast.flask.misc.Arg;
+import ast.flask.misc.ArgKw;
+import ast.flask.misc.RouteRouteArgKw;
+
 import java.util.List;
 
 public class CallExpr extends Expr {
-    public final Expr callee;
-    public final List<Arg> args;
+    public final List<ArgKw> routeArgKws;
 
-    public CallExpr(Expr callee, List<Arg> args, int line, int column) {
+    public CallExpr(List<ArgKw> routeArgKws, int line, int column) {
         super(line, column);
-        this.callee = callee;
-        this.args = args;
+        this.routeArgKws = routeArgKws;
+    }
+
+    @Override
+    public String toString() {
+        return "CallExpr{" +
+                "line=" + line +
+                ", column=" + column +
+                ", args=" + routeArgKws +
+                '}';
     }
 }

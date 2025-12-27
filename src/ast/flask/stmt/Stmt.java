@@ -1,9 +1,17 @@
 package ast.flask.stmt;
 
-import ast.flask.ASTNode;
+import ast.flask.FlaskASTNode;
 
-public abstract class Stmt extends ASTNode {
+public abstract class Stmt extends FlaskASTNode {
     protected Stmt(int line, int column) {
         super(line, column);
+    }
+
+    @Override
+    public String toString() {
+        return "Stmt{" +
+                "line=" + line +
+                ", column=" + column +
+                '}';
     }
 }

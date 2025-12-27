@@ -1,17 +1,26 @@
 package ast.flask.stmt;
 
-import ast.flask.expr.Expr;
+import ast.flask.misc.RouteArg;
+
 import java.util.List;
 
 public class RouteDefStmt extends Stmt {
-    public final Expr route;
-    public final List<Expr> args;
+    public final List<RouteArg> routeArgs;
     public final FuncDefStmt function;
 
-    public RouteDefStmt(Expr route, List<Expr> args, FuncDefStmt function, int line, int column) {
+    public RouteDefStmt(List<RouteArg> routeArgs, FuncDefStmt function, int line, int column) {
         super(line, column);
-        this.route = route;
-        this.args = args;
+        this.routeArgs = routeArgs;
         this.function = function;
+    }
+
+    @Override
+    public String toString() {
+        return "\nRouteDefStmt{\n" +
+                "args=" + routeArgs +
+                ", function=" + function +
+                ", line=" + line +
+                ", column=" + column +
+                "\n}";
     }
 }

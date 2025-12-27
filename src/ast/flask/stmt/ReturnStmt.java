@@ -9,4 +9,13 @@ public class ReturnStmt extends Stmt {
         super(line, column);
         this.value = value;
     }
+
+    @Override
+    public String toString() {
+        return "\nReturnStmt{\n" +
+                "line=" + line +
+                ", column=" + column +
+                ", value=" + value +
+                "\n}";
+    }
 }

@@ -1,15 +1,22 @@
 package ast.flask.misc;
 
-import ast.flask.ASTNode;
+import ast.flask.FlaskASTNode;
 import ast.flask.expr.Expr;
 
-public class DictPair extends ASTNode {
-    public final Expr key;
+public class DictPair extends FlaskASTNode {
+    public final String key;
     public final Expr value;
 
-    public DictPair(Expr key, Expr value, int line, int column) {
-        super(line, column);
+    public DictPair(String key, Expr value) {
         this.key = key;
         this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return "DictEntry{" +
+                "key='" + key + '\'' +
+                ", value=" + value +
+                '}';
     }
 }

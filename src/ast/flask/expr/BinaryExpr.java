@@ -11,4 +11,16 @@ public class BinaryExpr extends Expr {
         this.operator = operator;
         this.right = right;
     }
+
+    @Override
+    public String toString() {
+        return "BinaryExpr{" +
+                "line=" + line +
+                ", column=" + column +
+                ", left=" + left +
+                ", operator='" + operator + '\'' +
+                ", right=" + right +
+                '}';
+    }
+
 }

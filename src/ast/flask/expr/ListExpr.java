@@ -9,4 +9,14 @@ public class ListExpr extends Expr {
         super(line, column);
         this.elements = elements;
     }
+
+    @Override
+    public String toString() {
+        return "ListExpr{" +
+                "elements=" + elements +
+                ", line=" + line +
+                ", column=" + column +
+                '}';
+    }
+
 }

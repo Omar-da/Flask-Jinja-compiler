@@ -12,4 +12,14 @@ public class IfStmt extends Stmt {
         this.condition = condition;
         this.body = body;
     }
+
+    @Override
+    public String toString() {
+        return "\nIfStmt{\n" +
+                "condition=" + condition +
+                ", body=" + body +
+                ", line=" + line +
+                ", column=" + column +
+                "\n}";
+    }
 }

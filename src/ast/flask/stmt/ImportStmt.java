@@ -9,4 +9,13 @@ public class ImportStmt extends Stmt {
         super(line, column);
         this.names = names;
     }
+
+    @Override
+    public String toString() {
+        return "\nImportStmt{\n" +
+                "names=" + names +
+                ", line=" + line +
+                ", column=" + column +
+                "\n}";
+    }
 }

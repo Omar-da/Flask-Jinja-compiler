@@ -1,18 +1,70 @@
-import grammers.MiniFlaskLexer;
-import grammers.MiniFlaskParser;
-import grammers.MiniTemplateLexer;
-import grammers.MiniTemplateParser;
-
+import ast.template.TemplateASTNode;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
+import gen.grammers.MiniFlaskLexer;
+import gen.grammers.MiniTemplateLexer;
+import gen.grammers.MiniFlaskParser;
+import gen.grammers.MiniTemplateParser;
+import ast.flask.builder.FlaskASTBuilder;
+import ast.flask.builder.TemplateASTBuilder;
+import ast.flask.FlaskASTNode;
 
 public class Main {
 
+    // --------------------------------------------------
+    // Entry point
+    // --------------------------------------------------
     public static void main(String[] args) throws Exception {
+//        printParseTree();
+        printFlaskAST("===== Flask AST =====", "App/app.txt");
+        printTemplateAST("===== Index Template AST =====", "App/indexTemplate.txt");
+        printTemplateAST("===== Create Template AST =====", "App/createTemplate.txt");
+        printTemplateAST("===== Show Template AST =====", "App/showTemplate.txt");
 
-        // =========================
-        // Flask source
-        // =========================
+    }
+
+    private static void printFlaskAST(String title, String filePath) throws Exception {
+        System.out.println("\n" + title);
+
+        MiniFlaskParser parser = createFlaskParser(filePath);
+        ParseTree tree = parser.file();
+
+        FlaskASTNode ast = new FlaskASTBuilder().visit(tree);
+        System.out.println(ast);
+    }
+
+    private static void printTemplateAST(String title, String filePath) throws Exception {
+        System.out.println("\n" + title);
+
+        MiniTemplateParser parser = createTemplateParser(filePath);
+        ParseTree tree = parser.template();
+
+        TemplateASTNode ast = new TemplateASTBuilder().visit(tree);
+        System.out.println(ast);
+    }
+
+    // --------------------------------------------------
+    // Parser creation helpers
+    // --------------------------------------------------
+    private static MiniFlaskParser createFlaskParser(String filePath) throws Exception {
+        CharStream input = CharStreams.fromFileName(filePath);
+        MiniFlaskLexer lexer = new MiniFlaskLexer(input);
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        return new MiniFlaskParser(tokens);
+    }
+
+    private static MiniTemplateParser createTemplateParser(String filePath) throws Exception {
+        CharStream input = CharStreams.fromFileName(filePath);
+        MiniTemplateLexer lexer = new MiniTemplateLexer(input);
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        return new MiniTemplateParser(tokens);
+    }
+
+    // --------------------------------------------------
+    // Parser tree printing (UNCHANGED LOGIC)
+    // --------------------------------------------------
+    private static void printParseTree() throws Exception {
+
         parseAndPrint(
                 "===== Flask Parse Tree =====",
                 "App/app.txt",
@@ -21,9 +73,6 @@ public class Main {
                 parser -> ((MiniFlaskParser) parser).file()
         );
 
-        // =========================
-        // Index template
-        // =========================
         parseAndPrint(
                 "===== Index Template Parse Tree =====",
                 "App/indexTemplate.txt",
@@ -32,9 +81,6 @@ public class Main {
                 parser -> ((MiniTemplateParser) parser).template()
         );
 
-        // =========================
-        // Create template
-        // =========================
         parseAndPrint(
                 "===== Create Template Parse Tree =====",
                 "App/createTemplate.txt",
@@ -43,9 +89,6 @@ public class Main {
                 parser -> ((MiniTemplateParser) parser).template()
         );
 
-        // =========================
-        // Show template
-        // =========================
         parseAndPrint(
                 "===== Show Template Parse Tree =====",
                 "App/showTemplate.txt",
@@ -56,7 +99,7 @@ public class Main {
     }
 
     // --------------------------------------------------
-    // Generic parse + print pipeline
+    // Generic parse + print pipeline (parser tree)
     // --------------------------------------------------
     private static <L extends Lexer, P extends Parser> void parseAndPrint(
             String title,
@@ -78,7 +121,7 @@ public class Main {
     }
 
     // --------------------------------------------------
-    // Pretty tree printer
+    // Pretty parse tree printer (UNCHANGED)
     // --------------------------------------------------
     private static void printTree(ParseTree tree, Parser parser, int depth) {
         String indent = "  ".repeat(depth);
@@ -105,8 +148,9 @@ public class Main {
         }
     }
 
+
     // --------------------------------------------------
-    // Functional helpers (clean main)
+    // Functional helpers (parser tree only)
     // --------------------------------------------------
     @FunctionalInterface
     interface LexerFactory<L extends Lexer> {

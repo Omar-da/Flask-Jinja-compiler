@@ -344,10 +344,10 @@ primary
 suffix
     : JINJA_DOT JINJA_IDENT                        #FlaskAttrAccess
     | JINJA_LBRACK expr JINJA_RBRACK               #FlaskIndexing
-    | JINJA_LPAREN args? JINJA_RPAREN              #FlaskCallSuffix
+    | JINJA_LPAREN routeArgKws? JINJA_RPAREN              #FlaskCallSuffix
     ;
 
-args
+routeArgKws
     : arg (JINJA_COMMA arg)*                       #FlaskArgsList
     ;
 

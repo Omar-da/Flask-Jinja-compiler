@@ -14,4 +14,15 @@ public class FuncDefStmt extends Stmt {
         this.params = params;
         this.body = body;
     }
+
+    @Override
+    public String toString() {
+        return "\nFuncDefStmt{\n" +
+                "name='" + name + '\'' +
+                ", params=" + params +
+                ", body=" + body +
+                ", line=" + line +
+                ", column=" + column +
+                "\n}";
+    }
 }

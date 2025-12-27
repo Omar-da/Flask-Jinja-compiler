@@ -7,4 +7,14 @@ public class NameExpr extends Expr {
         super(line, column);
         this.name = name;
     }
+
+    @Override
+    public String toString() {
+        return "NameExpr{" +
+                "line=" + line +
+                ", column=" + column +
+                ", name='" + name + '\'' +
+                '}';
+    }
+
 }
