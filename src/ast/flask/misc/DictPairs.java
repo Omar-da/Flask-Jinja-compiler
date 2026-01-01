@@ -14,9 +14,8 @@ public class DictPairs extends FlaskASTNode {
 
     @Override
     public String toString() {
-        return "DictPairs{" +
-                "line=" + line +
-                ", column=" + column +
+        return "\nDictPairs{ " +
+                line + ":" + column +
                 ", entries=" + pairs +
                 '}';
     }

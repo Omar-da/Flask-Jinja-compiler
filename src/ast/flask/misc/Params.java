@@ -13,10 +13,9 @@ public class Params extends FlaskASTNode {
 
     @Override
     public String toString() {
-        return "Params{" +
-                "params=" + params +
-                ", line=" + line +
-                ", column=" + column +
+        return "\nParams{ " +
+                line + ":" + column +
+                ", params=" + params +
                 ", children=" + children +
                 '}';
     }

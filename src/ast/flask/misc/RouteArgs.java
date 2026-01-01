@@ -14,9 +14,8 @@ public class RouteArgs extends FlaskASTNode {
 
     @Override
     public String toString() {
-        return "Args{" +
-                ", line=" + line +
-                ", column=" + column +
+        return "\nArgs{ " +
+                line + ":" + column +
                 ", args=" + routeArgs +
                 '}';
     }

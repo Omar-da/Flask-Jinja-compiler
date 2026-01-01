@@ -14,10 +14,9 @@ public class DictExpr extends Expr {
 
     @Override
     public String toString() {
-        return "DictExpr{" +
-                "pairs=" + pairs +
-                ", line=" + line +
-                ", column=" + column +
+        return "\nDictExpr{ " +
+                line + ":" + column +
+                ", pairs=" + pairs +
                 '}';
     }
 }

@@ -14,9 +14,8 @@ public class BinaryExpr extends Expr {
 
     @Override
     public String toString() {
-        return "BinaryExpr{" +
-                "line=" + line +
-                ", column=" + column +
+        return "\nBinaryExpr{ " +
+                line + ":" + column +
                 ", left=" + left +
                 ", operator='" + operator + '\'' +
                 ", right=" + right +

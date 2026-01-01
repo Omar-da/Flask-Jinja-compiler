@@ -16,11 +16,10 @@ public class ArgKw extends FlaskASTNode {
 
     @Override
     public String toString() {
-        return "TemplateArgKw{" +
-                "name='" + name + '\'' +
+        return "\nTemplateArgKw{ " +
+                line + ":" + column +
+                ", name='" + name + '\'' +
                 ", value=" + value +
-                ", line=" + line +
-                ", column=" + column +
                 '}';
     }
 }

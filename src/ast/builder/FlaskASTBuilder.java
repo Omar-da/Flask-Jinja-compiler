@@ -332,7 +332,8 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
         }
 
         Expr value = (Expr) visit(ctx.expr());
-        return new DictPair(key, value);
+        Token t = ctx.getStart();
+        return new DictPair(t.getLine(), t.getCharPositionInLine(), key, value);
     }
 
     @Override

@@ -8,9 +8,8 @@ public class NoneExpr extends Expr {
 
     @Override
     public String toString() {
-        return "NoneExpr{" +
-                "line=" + line +
-                ", column=" + column +
+        return "\nNoneExpr{ " +
+                line + ":" + column +
                 '}';
     }
 }

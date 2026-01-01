@@ -10,9 +10,8 @@ public class NameExpr extends Expr {
 
     @Override
     public String toString() {
-        return "NameExpr{" +
-                "line=" + line +
-                ", column=" + column +
+        return "\nNameExpr{ " +
+                line + ":" + column +
                 ", name='" + name + '\'' +
                 '}';
     }

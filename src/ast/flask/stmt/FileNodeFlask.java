@@ -12,10 +12,9 @@ public class FileNodeFlask extends Stmt {
 
     @Override
     public String toString() {
-        return "FileNode{\n" +
-                "line=" + line +
-                ", column=" + column +
+        return "\nFileNode{ " +
+                line + ":" + column +
                 ", statements=" + statements +
-                "\n}";
+                "}";
     }
 }

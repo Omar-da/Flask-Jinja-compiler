@@ -15,9 +15,8 @@ public class RouteRouteArgKw extends FlaskASTNode implements RouteArg {
 
     @Override
     public String toString() {
-        return "Arg{" +
-                "line=" + line +
-                ", column=" + column +
+        return "\nArg{ " +
+                line + ":" + column +
                 ", name='" + name + '\'' +
                 ", value=" + value +
                 '}';

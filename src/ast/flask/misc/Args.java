@@ -15,10 +15,9 @@ public class Args extends FlaskASTNode {
 
     @Override
     public String toString() {
-        return "TemplateArgs{" +
-                "argKws=" + argKws +
-                ", line=" + line +
-                ", column=" + column +
+        return "\nTemplateArgs{ " +
+                line + ":" + column +
+                ", argKws=" + argKws +
                 '}';
     }
 }

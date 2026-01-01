@@ -15,11 +15,10 @@ public class Param extends FlaskASTNode {
 
     @Override
     public String toString() {
-        return "Param{" +
-                "name='" + name + '\'' +
+        return "\nParam{ " +
+                line + ":" + column +
+                ", name='" + name + '\'' +
                 ", defaultValue=" + defaultValue +
-                ", line=" + line +
-                ", column=" + column +
                 '}';
     }
 }

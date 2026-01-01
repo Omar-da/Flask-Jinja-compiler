@@ -12,10 +12,9 @@ public class ReturnStmt extends Stmt {
 
     @Override
     public String toString() {
-        return "\nReturnStmt{\n" +
-                "line=" + line +
-                ", column=" + column +
+        return "\nReturnStmt{ " +
+                line + ":" + column +
                 ", value=" + value +
-                "\n}";
+                "}";
     }
 }

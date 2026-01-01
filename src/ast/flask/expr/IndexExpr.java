@@ -10,9 +10,8 @@ public class IndexExpr extends Expr {
 
     @Override
     public String toString() {
-        return "IndexExpr{" +
-                "line=" + line +
-                ", column=" + column +
+        return "\nIndexExpr{ " +
+                line + ":" + column +
                 ", index=" + index +
                 '}';
     }

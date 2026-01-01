@@ -10,9 +10,8 @@ public class AttrAccessExpr extends Expr {
 
     @Override
     public String toString() {
-        return "AttrAccessExpr{" +
-                "line=" + line +
-                ", column=" + column +
+        return "\nAttrAccessExpr{ " +
+                line + ":" + column +
                 ", attribute='" + attribute + '\'' +
                 '}';
     }

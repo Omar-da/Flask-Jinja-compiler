@@ -14,11 +14,10 @@ public class AssignStmt extends Stmt {
 
     @Override
     public String toString() {
-        return "\nAssignStmt{\n" +
-                "line=" + line +
-                ", column=" + column +
+        return "\nAssignStmt{ " +
+                line + ":" + column +
                 ", target='" + target + '\'' +
                 ", value=" + value +
-                "\n}";
+                "}";
     }
 }

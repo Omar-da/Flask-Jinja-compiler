@@ -14,9 +14,8 @@ public class CallExpr extends Expr {
 
     @Override
     public String toString() {
-        return "CallExpr{" +
-                "line=" + line +
-                ", column=" + column +
+        return "\nCallExpr{ " +
+                line + ":" + column +
                 ", args=" + routeArgKws +
                 '}';
     }

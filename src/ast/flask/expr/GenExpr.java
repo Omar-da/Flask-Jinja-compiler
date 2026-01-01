@@ -17,9 +17,8 @@ public class GenExpr extends Expr {
     }
     @Override
     public String toString() {
-        return "GenExpr{" +
-                "line=" + line +
-                ", column=" + column +
+        return "\nGenExpr{ " +
+                line + ":" + column +
                 ", element=" + element +
                 ", var='" + var + '\'' +
                 ", iterable=" + iterable +

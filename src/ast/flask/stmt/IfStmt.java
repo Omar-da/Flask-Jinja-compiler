@@ -15,11 +15,10 @@ public class IfStmt extends Stmt {
 
     @Override
     public String toString() {
-        return "\nIfStmt{\n" +
-                "condition=" + condition +
+        return "\nIfStmt{ " +
+                line + ":" + column +
+                ", condition=" + condition +
                 ", body=" + body +
-                ", line=" + line +
-                ", column=" + column +
-                "\n}";
+                "}";
     }
 }

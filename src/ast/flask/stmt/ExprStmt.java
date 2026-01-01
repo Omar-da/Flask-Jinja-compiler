@@ -12,10 +12,9 @@ public class ExprStmt extends Stmt {
 
     @Override
     public String toString() {
-        return "\nExprStmt{\n" +
-                "line=" + line +
-                ", column=" + column +
+        return "\nExprStmt{ " +
+                line + ":" + column +
                 ", expr=" + expr +
-                "\n}";
+                "}";
     }
 }

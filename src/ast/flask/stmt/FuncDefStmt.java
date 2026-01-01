@@ -17,12 +17,11 @@ public class FuncDefStmt extends Stmt {
 
     @Override
     public String toString() {
-        return "\nFuncDefStmt{\n" +
-                "name='" + name + '\'' +
+        return "\nFuncDefStmt{ " +
+                line + ":" + column +
+                ", name='" + name + '\'' +
                 ", params=" + params +
                 ", body=" + body +
-                ", line=" + line +
-                ", column=" + column +
-                "\n}";
+                "}";
     }
 }

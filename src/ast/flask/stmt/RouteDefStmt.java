@@ -16,11 +16,10 @@ public class RouteDefStmt extends Stmt {
 
     @Override
     public String toString() {
-        return "\nRouteDefStmt{\n" +
-                "args=" + routeArgs +
+        return "\nRouteDefStmt{ " +
+                line + ":" + column +
+                ", args=" + routeArgs +
                 ", function=" + function +
-                ", line=" + line +
-                ", column=" + column +
-                "\n}";
+                "}";
     }
 }

@@ -10,10 +10,9 @@ public class TypeExpr extends Expr {
 
     @Override
     public String toString() {
-        return "TypeExpr{" +
-                "name='" + name + '\'' +
-                ", line=" + line +
-                ", column=" + column +
+        return "\nTypeExpr{ " +
+                line + ":" + column +
+                ", name='" + name + '\'' +
                 '}';
     }
 }

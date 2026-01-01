@@ -12,10 +12,9 @@ public class ListExpr extends Expr {
 
     @Override
     public String toString() {
-        return "ListExpr{" +
-                "elements=" + elements +
-                ", line=" + line +
-                ", column=" + column +
+        return "\nListExpr{ " +
+                line + ":" + column +
+                ", elements=" + elements +
                 '}';
     }
 

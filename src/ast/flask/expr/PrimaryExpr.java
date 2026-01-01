@@ -14,9 +14,8 @@ public class PrimaryExpr extends Expr {
 
     @Override
     public String toString() {
-        return "PrimaryExpr{" +
-                "line=" + line +
-                ", column=" + column +
+        return "\nPrimaryExpr{ " +
+                line + ":" + column +
                 ", base=" + base +
                 ", suffixes=" + suffixes +
                 '}';

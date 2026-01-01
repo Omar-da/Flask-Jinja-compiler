@@ -12,10 +12,9 @@ public class ImportStmt extends Stmt {
 
     @Override
     public String toString() {
-        return "\nImportStmt{\n" +
-                "names=" + names +
-                ", line=" + line +
-                ", column=" + column +
-                "\n}";
+        return "\nImportStmt{ " +
+                line + ":" + column +
+                "و names=" + names +
+                "}";
     }
 }
