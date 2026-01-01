@@ -1,11 +1,12 @@
 package ast.flask.misc;
 
+
 import ast.flask.FlaskASTNode;
 import ast.flask.expr.Expr;
 
 public class ArgKw extends FlaskASTNode {
-    public final String name;  // keyword argument name
-    public final Expr value;   // expression assigned to this argument
+    public final String name;
+    public final Expr value;
 
     public ArgKw(String name, Expr value, int line, int column) {
         super(line, column);
@@ -15,7 +16,7 @@ public class ArgKw extends FlaskASTNode {
 
     @Override
     public String toString() {
-        return "ArgKw{" +
+        return "TemplateArgKw{" +
                 "name='" + name + '\'' +
                 ", value=" + value +
                 ", line=" + line +

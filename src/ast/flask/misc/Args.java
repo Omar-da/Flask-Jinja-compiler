@@ -1,6 +1,8 @@
 package ast.flask.misc;
 
 import ast.flask.FlaskASTNode;
+
+
 import java.util.List;
 
 public class Args extends FlaskASTNode {
@@ -13,7 +15,7 @@ public class Args extends FlaskASTNode {
 
     @Override
     public String toString() {
-        return "Args{" +
+        return "TemplateArgs{" +
                 "argKws=" + argKws +
                 ", line=" + line +
                 ", column=" + column +

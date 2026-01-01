@@ -3372,7 +3372,7 @@ public class MiniFlaskParser extends Parser {
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
-	public static class FlaskGeneratorExprContext extends GenExprContext {
+	public static class 	FlaskGeneratorExprContext extends GenExprContext {
 		public TerminalNode LPAREN() { return getToken(MiniFlaskParser.LPAREN, 0); }
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);

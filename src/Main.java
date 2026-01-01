@@ -5,8 +5,8 @@ import gen.grammers.MiniFlaskLexer;
 import gen.grammers.MiniTemplateLexer;
 import gen.grammers.MiniFlaskParser;
 import gen.grammers.MiniTemplateParser;
-import ast.flask.builder.FlaskASTBuilder;
-import ast.flask.builder.TemplateASTBuilder;
+import ast.builder.FlaskASTBuilder;
+import ast.builder.TemplateASTBuilder;
 import ast.flask.FlaskASTNode;
 
 public class Main {
@@ -16,10 +16,10 @@ public class Main {
     // --------------------------------------------------
     public static void main(String[] args) throws Exception {
 //        printParseTree();
-        printFlaskAST("===== Flask AST =====", "App/app.txt");
-        printTemplateAST("===== Index Template AST =====", "App/indexTemplate.txt");
-        printTemplateAST("===== Create Template AST =====", "App/createTemplate.txt");
-        printTemplateAST("===== Show Template AST =====", "App/showTemplate.txt");
+        printFlaskAST("================================================================ Flask AST ================================================================", "App/app.txt");
+        printTemplateAST("================================================================ Index Template AST ================================================================", "App/indexTemplate.txt");
+        printTemplateAST("================================================================ Create Template AST ================================================================", "App/createTemplate.txt");
+        printTemplateAST("================================================================ Show Template AST ================================================================", "App/showTemplate.txt");
 
     }
 

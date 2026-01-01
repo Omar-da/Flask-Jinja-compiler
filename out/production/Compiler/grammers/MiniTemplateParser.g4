@@ -288,7 +288,7 @@ pseudoElement
     ;
 
 jinjaVar
-    : varStart expr JINJA_VAR_END #TemplateJinjaVarExpr
+    : varStart expr JINJA_VAR_END       #TemplateJinjaVarExpr
     ;
 
 varStart
@@ -344,7 +344,7 @@ primary
 suffix
     : JINJA_DOT JINJA_IDENT                        #FlaskAttrAccess
     | JINJA_LBRACK expr JINJA_RBRACK               #FlaskIndexing
-    | JINJA_LPAREN routeArgKws? JINJA_RPAREN              #FlaskCallSuffix
+    | JINJA_LPAREN routeArgKws? JINJA_RPAREN       #FlaskCallSuffix
     ;
 
 routeArgKws

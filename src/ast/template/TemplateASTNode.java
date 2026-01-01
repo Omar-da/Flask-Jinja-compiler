@@ -32,9 +32,8 @@ public class TemplateASTNode {
 
     @Override
     public String toString() {
-        return "ASTNode{" +
-                "line=" + line +
-                ", column=" + column +
+        return  "ASTNode{ " +
+                line + ":" + column +
                 ", children=" + children +
                 '}';
     }

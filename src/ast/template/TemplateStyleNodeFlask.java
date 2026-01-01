@@ -1,14 +1,13 @@
 package ast.template;
 
-public class TemplateStyleNodeFlask extends TemplateElementNodeFlask {
+public class TemplateStyleNodeFlask extends TemplateElementNode {
     public TemplateStyleNodeFlask() { super(); }
     public TemplateStyleNodeFlask(int line, int column) { super(line, column); }
 
     @Override
     public String toString() {
-        return "TemplateStyleNode{" +
-                "line=" + line +
-                ", column=" + column +
+        return "\nTemplateStyleNode{ " +
+                line + ":" + column +
                 '}';
     }
 }

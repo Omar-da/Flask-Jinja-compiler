@@ -12,11 +12,10 @@ public class TemplatePseudoNodeTemplate extends TemplateASTNode {
 
     @Override
     public String toString() {
-        return "TemplatePseudoNode{" +
-                "type='" + type + '\'' +
-                ", name='" + name + '\'' +
-                ", line=" + line +
-                ", column=" + column +
+        return "\nTemplatePseudoNode{ " +
+                line + ":" + column +
+                ", type=" + type +
+                ", name=" + name +
                 ", children=" + children +
                 '}';
     }
