@@ -21,7 +21,7 @@
   justify-content: space-between;
   align-items: flex-start;
   transform: translateX(-50%) translateY({{ card_y_offset }}px);
-  box-shadow: 0 4px 8px rgba({{ shadow_r }}, {{ shadow_g }}, {{ shadow_b }}, 0.2), 0 8px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba({{ shadow_r }}, {{ shadow_g }}, {{ shadow_b }}, 0.2) 0 8px 16px rgba(0, 0, 0, 0.1);
   width: calc(50% - {{ card_gap }}px);
   padding: 1rem 1.5rem;
 }

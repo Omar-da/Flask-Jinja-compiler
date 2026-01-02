@@ -933,7 +933,7 @@ public interface MiniTemplateParserVisitor<T> extends ParseTreeVisitor<T> {
 	T visitFlaskCallSuffix(MiniTemplateParser.FlaskCallSuffixContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code FlaskArgsList}
-	 * labeled alternative in {@link MiniTemplateParser#args}.
+	 * labeled alternative in {@link MiniTemplateParser#routeArgKws}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */

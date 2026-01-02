@@ -499,13 +499,13 @@ public interface MiniFlaskParserListener extends ParseTreeListener {
 	void exitFlaskGenExpr(MiniFlaskParser.FlaskGenExprContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code FlaskArgsList}
-	 * labeled alternative in {@link MiniFlaskParser#args}.
+	 * labeled alternative in {@link MiniFlaskParser#routeArgKws}.
 	 * @param ctx the parse tree
 	 */
 	void enterFlaskArgsList(MiniFlaskParser.FlaskArgsListContext ctx);
 	/**
 	 * Exit a parse tree produced by the {@code FlaskArgsList}
-	 * labeled alternative in {@link MiniFlaskParser#args}.
+	 * labeled alternative in {@link MiniFlaskParser#routeArgKws}.
 	 * @param ctx the parse tree
 	 */
 	void exitFlaskArgsList(MiniFlaskParser.FlaskArgsListContext ctx);

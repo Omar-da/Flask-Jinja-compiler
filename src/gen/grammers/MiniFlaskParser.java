@@ -29,15 +29,16 @@ public class MiniFlaskParser extends Parser {
 		RULE_typeAnnotatedParam = 12, RULE_typeAnnotatedDefaultParam = 13, RULE_starParam = 14, 
 		RULE_doubleStarParam = 15, RULE_typeExpr = 16, RULE_assign = 17, RULE_ifStmt = 18, 
 		RULE_returnStmt = 19, RULE_exprStmt = 20, RULE_expr = 21, RULE_additive = 22, 
-		RULE_primary = 23, RULE_suffix = 24, RULE_args = 25, RULE_arg = 26, RULE_atom = 27, 
-		RULE_listLiteral = 28, RULE_dictLiteral = 29, RULE_pair = 30, RULE_genExpr = 31;
+		RULE_primary = 23, RULE_suffix = 24, RULE_routeArgKws = 25, RULE_arg = 26, 
+		RULE_atom = 27, RULE_listLiteral = 28, RULE_dictLiteral = 29, RULE_pair = 30, 
+		RULE_genExpr = 31;
 	private static String[] makeRuleNames() {
 		return new String[] {
 			"file", "statement", "importStmt", "importNames", "routeDef", "routeArgs", 
 			"routeArg", "funcDef", "params", "param", "simpleParam", "defaultParam", 
 			"typeAnnotatedParam", "typeAnnotatedDefaultParam", "starParam", "doubleStarParam", 
 			"typeExpr", "assign", "ifStmt", "returnStmt", "exprStmt", "expr", "additive", 
-			"primary", "suffix", "args", "arg", "atom", "listLiteral", "dictLiteral", 
+			"primary", "suffix", "routeArgKws", "arg", "atom", "listLiteral", "dictLiteral", 
 			"pair", "genExpr"
 		};
 	}
@@ -2196,8 +2197,8 @@ public class MiniFlaskParser extends Parser {
 		public TerminalNode NEWLINE(int i) {
 			return getToken(MiniFlaskParser.NEWLINE, i);
 		}
-		public ArgsContext args() {
-			return getRuleContext(ArgsContext.class,0);
+		public RouteArgKwsContext routeArgKws() {
+			return getRuleContext(RouteArgKwsContext.class,0);
 		}
 		public FlaskCallSuffixContext(SuffixContext ctx) { copyFrom(ctx); }
 		@Override
@@ -2335,7 +2336,7 @@ public class MiniFlaskParser extends Parser {
 				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & 5569552L) != 0)) {
 					{
 					setState(237);
-					args();
+					routeArgKws();
 					}
 				}
 
@@ -2379,19 +2380,19 @@ public class MiniFlaskParser extends Parser {
 	}
 
 	@SuppressWarnings("CheckReturnValue")
-	public static class ArgsContext extends ParserRuleContext {
-		public ArgsContext(ParserRuleContext parent, int invokingState) {
+	public static class RouteArgKwsContext extends ParserRuleContext {
+		public RouteArgKwsContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_args; }
+		@Override public int getRuleIndex() { return RULE_routeArgKws; }
 	 
-		public ArgsContext() { }
-		public void copyFrom(ArgsContext ctx) {
+		public RouteArgKwsContext() { }
+		public void copyFrom(RouteArgKwsContext ctx) {
 			super.copyFrom(ctx);
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
-	public static class FlaskArgsListContext extends ArgsContext {
+	public static class FlaskArgsListContext extends RouteArgKwsContext {
 		public List<ArgContext> arg() {
 			return getRuleContexts(ArgContext.class);
 		}
@@ -2406,7 +2407,7 @@ public class MiniFlaskParser extends Parser {
 		public TerminalNode NEWLINE(int i) {
 			return getToken(MiniFlaskParser.NEWLINE, i);
 		}
-		public FlaskArgsListContext(ArgsContext ctx) { copyFrom(ctx); }
+		public FlaskArgsListContext(RouteArgKwsContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
 			if ( listener instanceof MiniFlaskParserListener ) ((MiniFlaskParserListener)listener).enterFlaskArgsList(this);
@@ -2422,9 +2423,9 @@ public class MiniFlaskParser extends Parser {
 		}
 	}
 
-	public final ArgsContext args() throws RecognitionException {
-		ArgsContext _localctx = new ArgsContext(_ctx, getState());
-		enterRule(_localctx, 50, RULE_args);
+	public final RouteArgKwsContext routeArgKws() throws RecognitionException {
+		RouteArgKwsContext _localctx = new RouteArgKwsContext(_ctx, getState());
+		enterRule(_localctx, 50, RULE_routeArgKws);
 		int _la;
 		try {
 			int _alt;
@@ -3372,7 +3373,7 @@ public class MiniFlaskParser extends Parser {
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
-	public static class 	FlaskGeneratorExprContext extends GenExprContext {
+	public static class FlaskGeneratorExprContext extends GenExprContext {
 		public TerminalNode LPAREN() { return getToken(MiniFlaskParser.LPAREN, 0); }
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);

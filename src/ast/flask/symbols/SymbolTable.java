@@ -9,6 +9,7 @@ public class SymbolTable {
         globalScope.define(new Symbol("__name__", SymbolKind.VARIABLE, null, -1, -1));
         globalScope.define(new Symbol("next", SymbolKind.FUNCTION, null, -1, -1));
         globalScope.define(new Symbol("len", SymbolKind.FUNCTION, null, -1, -1));
+        globalScope.define(new Symbol("max", SymbolKind.FUNCTION, null, -1, -1));
         this.currentScope = globalScope;
     }
 

@@ -298,7 +298,7 @@ public interface MiniFlaskParserVisitor<T> extends ParseTreeVisitor<T> {
 	T visitFlaskGenExpr(MiniFlaskParser.FlaskGenExprContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code FlaskArgsList}
-	 * labeled alternative in {@link MiniFlaskParser#args}.
+	 * labeled alternative in {@link MiniFlaskParser#routeArgKws}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */

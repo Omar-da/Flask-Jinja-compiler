@@ -26,3 +26,4 @@ def index():
         max_price=max_price,
         link=url_for("index")
     )
+

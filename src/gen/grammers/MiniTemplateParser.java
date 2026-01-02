@@ -67,7 +67,7 @@ public class MiniTemplateParser extends Parser {
 		RULE_pseudoClass = 51, RULE_pseudoArgs = 52, RULE_pseudoExpr = 53, RULE_pseudoExprAtom = 54, 
 		RULE_pseudoElement = 55, RULE_jinjaVar = 56, RULE_varStart = 57, RULE_jinjaBlock = 58, 
 		RULE_jinjaFor = 59, RULE_jinjaIf = 60, RULE_blockStart = 61, RULE_expr = 62, 
-		RULE_additive = 63, RULE_primary = 64, RULE_suffix = 65, RULE_args = 66, 
+		RULE_additive = 63, RULE_primary = 64, RULE_suffix = 65, RULE_routeArgKws = 66, 
 		RULE_arg = 67, RULE_atom = 68, RULE_listLiteral = 69, RULE_dictLiteral = 70, 
 		RULE_pair = 71, RULE_genExpr = 72;
 	private static String[] makeRuleNames() {
@@ -83,7 +83,7 @@ public class MiniTemplateParser extends Parser {
 			"classPart", "idPart", "combinator", "pseudoClass", "pseudoArgs", "pseudoExpr", 
 			"pseudoExprAtom", "pseudoElement", "jinjaVar", "varStart", "jinjaBlock", 
 			"jinjaFor", "jinjaIf", "blockStart", "expr", "additive", "primary", "suffix", 
-			"args", "arg", "atom", "listLiteral", "dictLiteral", "pair", "genExpr"
+			"routeArgKws", "arg", "atom", "listLiteral", "dictLiteral", "pair", "genExpr"
 		};
 	}
 	public static final String[] ruleNames = makeRuleNames();
@@ -6943,8 +6943,8 @@ public class MiniTemplateParser extends Parser {
 	public static class FlaskCallSuffixContext extends SuffixContext {
 		public TerminalNode JINJA_LPAREN() { return getToken(MiniTemplateParser.JINJA_LPAREN, 0); }
 		public TerminalNode JINJA_RPAREN() { return getToken(MiniTemplateParser.JINJA_RPAREN, 0); }
-		public ArgsContext args() {
-			return getRuleContext(ArgsContext.class,0);
+		public RouteArgKwsContext routeArgKws() {
+			return getRuleContext(RouteArgKwsContext.class,0);
 		}
 		public FlaskCallSuffixContext(SuffixContext ctx) { copyFrom(ctx); }
 		@Override
@@ -7045,7 +7045,7 @@ public class MiniTemplateParser extends Parser {
 				if (((((_la - 107)) & ~0x3f) == 0 && ((1L << (_la - 107)) & 117784591L) != 0)) {
 					{
 					setState(705);
-					args();
+					routeArgKws();
 					}
 				}
 
@@ -7069,19 +7069,19 @@ public class MiniTemplateParser extends Parser {
 	}
 
 	@SuppressWarnings("CheckReturnValue")
-	public static class ArgsContext extends ParserRuleContext {
-		public ArgsContext(ParserRuleContext parent, int invokingState) {
+	public static class RouteArgKwsContext extends ParserRuleContext {
+		public RouteArgKwsContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_args; }
+		@Override public int getRuleIndex() { return RULE_routeArgKws; }
 	 
-		public ArgsContext() { }
-		public void copyFrom(ArgsContext ctx) {
+		public RouteArgKwsContext() { }
+		public void copyFrom(RouteArgKwsContext ctx) {
 			super.copyFrom(ctx);
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
-	public static class FlaskArgsListContext extends ArgsContext {
+	public static class FlaskArgsListContext extends RouteArgKwsContext {
 		public List<ArgContext> arg() {
 			return getRuleContexts(ArgContext.class);
 		}
@@ -7092,7 +7092,7 @@ public class MiniTemplateParser extends Parser {
 		public TerminalNode JINJA_COMMA(int i) {
 			return getToken(MiniTemplateParser.JINJA_COMMA, i);
 		}
-		public FlaskArgsListContext(ArgsContext ctx) { copyFrom(ctx); }
+		public FlaskArgsListContext(RouteArgKwsContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
 			if ( listener instanceof MiniTemplateParserListener ) ((MiniTemplateParserListener)listener).enterFlaskArgsList(this);
@@ -7108,9 +7108,9 @@ public class MiniTemplateParser extends Parser {
 		}
 	}
 
-	public final ArgsContext args() throws RecognitionException {
-		ArgsContext _localctx = new ArgsContext(_ctx, getState());
-		enterRule(_localctx, 132, RULE_args);
+	public final RouteArgKwsContext routeArgKws() throws RecognitionException {
+		RouteArgKwsContext _localctx = new RouteArgKwsContext(_ctx, getState());
+		enterRule(_localctx, 132, RULE_routeArgKws);
 		int _la;
 		try {
 			_localctx = new FlaskArgsListContext(_localctx);

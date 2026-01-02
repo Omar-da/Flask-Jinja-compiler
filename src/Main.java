@@ -15,11 +15,32 @@ public class Main {
     // Entry point
     // --------------------------------------------------
     public static void main(String[] args) throws Exception {
-//        printParseTree();
-        printFlaskAST("================================================================ Flask AST ================================================================", "App/app.txt");
-        printTemplateAST("================================================================ Index Template AST ================================================================", "App/indexTemplate.txt");
-        printTemplateAST("================================================================ Create Template AST ================================================================", "App/createTemplate.txt");
-        printTemplateAST("================================================================ Show Template AST ================================================================", "App/showTemplate.txt");
+
+        // Parser Trees
+        printParseTree();
+
+        printFlaskAST("================================================================ Flask AST ================================================================",
+                "App/app.txt");
+        printTemplateAST("================================================================ Index Template AST ================================================================",
+                "App/indexTemplate.txt");
+        printTemplateAST("================================================================ Create Template AST ================================================================",
+                "App/createTemplate.txt");
+        printTemplateAST("================================================================ Show Template AST ================================================================",
+                "App/showTemplate.txt");
+
+        // Flask Tests
+        printFlaskAST("================================================================ Test 1 ================================================================",
+                "tests/FlaskTest1");
+        printFlaskAST("================================================================ Test 2 ================================================================",
+                "tests/FlaskTest2");
+
+        // Template Tests
+        printTemplateAST("================================================================ Test 1 ================================================================",
+                "tests/JinjaTest1");
+        printTemplateAST("================================================================ Test 2 ================================================================",
+                "tests/JinjaTest2");
+        printTemplateAST("================================================================ Test 3 ================================================================",
+                "tests/JinjaTest3");
 
     }
 
@@ -66,7 +87,7 @@ public class Main {
     private static void printParseTree() throws Exception {
 
         parseAndPrint(
-                "===== Flask Parse Tree =====",
+                "================================================================ Flask Parse Tree ================================================================",
                 "App/app.txt",
                 MiniFlaskLexer::new,
                 MiniFlaskParser::new,
@@ -74,7 +95,7 @@ public class Main {
         );
 
         parseAndPrint(
-                "===== Index Template Parse Tree =====",
+                "================================================================ Index Template Parse Tree ================================================================",
                 "App/indexTemplate.txt",
                 MiniTemplateLexer::new,
                 MiniTemplateParser::new,
@@ -82,7 +103,7 @@ public class Main {
         );
 
         parseAndPrint(
-                "===== Create Template Parse Tree =====",
+                "================================================================ Create Template Parse Tree ================================================================",
                 "App/createTemplate.txt",
                 MiniTemplateLexer::new,
                 MiniTemplateParser::new,
@@ -90,7 +111,7 @@ public class Main {
         );
 
         parseAndPrint(
-                "===== Show Template Parse Tree =====",
+                "================================================================ Show Template Parse Tree ================================================================",
                 "App/showTemplate.txt",
                 MiniTemplateLexer::new,
                 MiniTemplateParser::new,

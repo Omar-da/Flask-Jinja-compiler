@@ -1587,13 +1587,13 @@ public interface MiniTemplateParserListener extends ParseTreeListener {
 	void exitFlaskCallSuffix(MiniTemplateParser.FlaskCallSuffixContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code FlaskArgsList}
-	 * labeled alternative in {@link MiniTemplateParser#args}.
+	 * labeled alternative in {@link MiniTemplateParser#routeArgKws}.
 	 * @param ctx the parse tree
 	 */
 	void enterFlaskArgsList(MiniTemplateParser.FlaskArgsListContext ctx);
 	/**
 	 * Exit a parse tree produced by the {@code FlaskArgsList}
-	 * labeled alternative in {@link MiniTemplateParser#args}.
+	 * labeled alternative in {@link MiniTemplateParser#routeArgKws}.
 	 * @param ctx the parse tree
 	 */
 	void exitFlaskArgsList(MiniTemplateParser.FlaskArgsListContext ctx);

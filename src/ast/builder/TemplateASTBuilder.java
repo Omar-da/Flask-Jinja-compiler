@@ -462,8 +462,8 @@ public class TemplateASTBuilder extends MiniTemplateParserBaseVisitor<TemplateAS
     public TemplateASTNode visitFlaskCallSuffix(MiniTemplateParser.FlaskCallSuffixContext ctx) {
         List<TemplateArgKw> argKws = new ArrayList<>();
 
-        if (ctx.args() != null) {
-            TemplateArgs argsNode = (TemplateArgs) visit(ctx.args());
+        if (ctx.routeArgKws() != null) {
+            TemplateArgs argsNode = (TemplateArgs) visit(ctx.routeArgKws());
             argKws.addAll(argsNode.templateArgKws);
         }
 

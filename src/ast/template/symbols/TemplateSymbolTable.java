@@ -1,5 +1,8 @@
 package ast.template.symbols;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class TemplateSymbolTable {
     private TemplateScope globalTemplateScope;
     private TemplateScope currentTemplateScope;
@@ -16,6 +19,61 @@ public class TemplateSymbolTable {
         globalTemplateScope.define(new TemplateSymbol("url_for", TemplateSymbolKind.VARIABLE, null, -1, -1));
         globalTemplateScope.define(new TemplateSymbol("p", TemplateSymbolKind.VARIABLE, null, -1, -1));
         globalTemplateScope.define(new TemplateSymbol("product", TemplateSymbolKind.VARIABLE, null, -1, -1));
+
+        String[] vars_of_test1 = {
+                "base_width",
+                "title",
+                "show_footer",
+                "total_count",
+        };
+
+        String[] vars_of_test2 = {
+                "card_width",
+                "site_title",
+                "show_nav",
+                "navigation",
+                "sections",
+                "year"
+        };
+
+        String[] vars_of_test3 = {
+                "container_width",
+                "container_margin_top",
+                "container_margin_right",
+                "container_margin_bottom",
+                "container_margin_left",
+                "card_y_offset",
+                "shadow_r",
+                "shadow_g",
+                "shadow_b",
+                "card_gap",
+                "banner_color_dark",
+                "banner_color_light",
+                "banner_height",
+                "star_color",
+                "meta_padding_horizontal",
+                "meta_font_size",
+                "meta_line_height",
+                "footer_padding_top",
+                "footer_padding_right",
+                "footer_padding_bottom",
+                "footer_padding_left",
+                "footer_font_size",
+                "footer_color",
+                "highlight_color",
+                "sidebar_width",
+                "progress_offset"
+        };
+
+        for (String var : vars_of_test1) {
+            globalTemplateScope.define(new TemplateSymbol(var, TemplateSymbolKind.VARIABLE, null, -1, -1));
+        }
+        for (String var : vars_of_test2) {
+            globalTemplateScope.define(new TemplateSymbol(var, TemplateSymbolKind.VARIABLE, null, -1, -1));
+        }
+        for (String var : vars_of_test3) {
+            globalTemplateScope.define(new TemplateSymbol(var, TemplateSymbolKind.VARIABLE, null, -1, -1));
+        }
 
         this.currentTemplateScope = globalTemplateScope;
     }

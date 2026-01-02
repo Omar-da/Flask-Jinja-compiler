@@ -152,8 +152,8 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
     public FlaskASTNode visitFlaskCallSuffix(MiniFlaskParser.FlaskCallSuffixContext ctx) {
         List<ArgKw> argKws = new ArrayList<>();
 
-        if (ctx.args() != null) {
-            Args argsNode = (Args) visit(ctx.args());
+        if (ctx.routeArgKws() != null) {
+            Args argsNode = (Args) visit(ctx.routeArgKws());
             argKws.addAll(argsNode.argKws);
         }
 
