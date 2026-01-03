@@ -24,6 +24,8 @@ NEWLINE : '\r'? '\n'+ -> skip ;
 TEXT    : ~[{}%<>"]+;
 WS : [ \t]+ -> skip ;
 
+
+
 mode HTML_CONTENT;
 
 HTML_CONTENT_H1_START     : '<h1' -> pushMode(HTML_ATTR);
@@ -63,6 +65,8 @@ UL_END      : '</ul>' -> popMode;
 LI_END      : '</li>' -> popMode;
 A_END       : '</a>' -> popMode;
 
+
+
 mode HTML_ATTR;
 
 HTML_ATTR_EQUALS      : '=';
@@ -75,6 +79,8 @@ HTML_ATTR_IDENT       : [a-zA-Z_-][a-zA-Z0-9_-]*;
 HTML_ATTR_WS          : [ \t\r\n]+ -> skip;
 HTML_ATTR_GT          : '>' -> popMode, pushMode(HTML_CONTENT);
 
+
+
 mode HTML_ATTR_VALUE;
 
 HTML_ATTR_VALUE_COMMENT : '<!--' .*? '-->' -> skip;
@@ -82,6 +88,8 @@ HTML_ATTR_VALUE_TEXT: ~[{}%<>"]+;
 HTML_ATTR_VALUE_VAR_START   : '{{' ->pushMode(JINJA);
 HTML_ATTR_VALUE_BLOCK_START : '{%' ->pushMode(JINJA);
 HTML_ATTR_VALUE_DOUBLE_QUOTE: '"' -> popMode;
+
+
 
 mode CSS;
 
@@ -114,6 +122,8 @@ CSS_NEWLINE : '\r'? '\n'+ -> skip;
 CSS_WS      : [ \t\r\n]+ -> skip;
 CSS_STYLE_END   : '</style>' -> popMode;
 
+
+
 mode CSS_RULE;
 
 CSS_RULE_COLON   : ':' -> pushMode(CSS_VALUE);
@@ -121,6 +131,8 @@ CSS_RULE_COMMENT : '/*' .*? '*/' -> skip;
 CSS_RULE_IDENT   : [a-zA-Z_-][a-zA-Z0-9_-]*;
 CSS_RULE_WS      : [ \t\r\n]+ -> skip;
 CSS_RULE_RBRACE  : '}' -> popMode;
+
+
 
 mode CSS_VALUE;
 

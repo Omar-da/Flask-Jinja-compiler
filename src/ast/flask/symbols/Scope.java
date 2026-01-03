@@ -5,8 +5,8 @@ import java.util.Map;
 
 public class Scope {
     private final Map<String, Symbol> symbols = new HashMap<>();
-    private final Scope parent; // null for global scope
-    private final String name;  // optional: e.g., "global", "function foo"
+    private final Scope parent;
+    private final String name;
 
     public Scope(Scope parent, String name) {
         this.parent = parent;

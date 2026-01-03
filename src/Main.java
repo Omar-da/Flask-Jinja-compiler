@@ -16,6 +16,8 @@ public class Main {
     // --------------------------------------------------
     public static void main(String[] args) throws Exception {
 
+//        printFlaskAST("================================================================ Flask AST ================================================================",
+//                "tests/FlaskTest3(scopes)");
         // Parser Trees
         printParseTree();
 
@@ -88,35 +90,35 @@ public class Main {
 
         parseAndPrint(
                 "================================================================ Flask Parse Tree ================================================================",
-                "App/app.txt",
+                "tests/FlaskTest3(scopes)",
                 MiniFlaskLexer::new,
                 MiniFlaskParser::new,
                 parser -> ((MiniFlaskParser) parser).file()
         );
-
-        parseAndPrint(
-                "================================================================ Index Template Parse Tree ================================================================",
-                "App/indexTemplate.txt",
-                MiniTemplateLexer::new,
-                MiniTemplateParser::new,
-                parser -> ((MiniTemplateParser) parser).template()
-        );
-
-        parseAndPrint(
-                "================================================================ Create Template Parse Tree ================================================================",
-                "App/createTemplate.txt",
-                MiniTemplateLexer::new,
-                MiniTemplateParser::new,
-                parser -> ((MiniTemplateParser) parser).template()
-        );
-
-        parseAndPrint(
-                "================================================================ Show Template Parse Tree ================================================================",
-                "App/showTemplate.txt",
-                MiniTemplateLexer::new,
-                MiniTemplateParser::new,
-                parser -> ((MiniTemplateParser) parser).template()
-        );
+//
+//        parseAndPrint(
+//                "================================================================ Index Template Parse Tree ================================================================",
+//                "App/indexTemplate.txt",
+//                MiniTemplateLexer::new,
+//                MiniTemplateParser::new,
+//                parser -> ((MiniTemplateParser) parser).template()
+//        );
+//
+//        parseAndPrint(
+//                "================================================================ Create Template Parse Tree ================================================================",
+//                "App/createTemplate.txt",
+//                MiniTemplateLexer::new,
+//                MiniTemplateParser::new,
+//                parser -> ((MiniTemplateParser) parser).template()
+//        );
+//
+//        parseAndPrint(
+//                "================================================================ Show Template Parse Tree ================================================================",
+//                "App/showTemplate.txt",
+//                MiniTemplateLexer::new,
+//                MiniTemplateParser::new,
+//                parser -> ((MiniTemplateParser) parser).template()
+//        );
     }
 
     // --------------------------------------------------

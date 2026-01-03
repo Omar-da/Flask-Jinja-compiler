@@ -25,6 +25,13 @@ public class MiniFlaskParserBaseVisitor<T> extends AbstractParseTreeVisitor<T> i
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
+	@Override public T visitStatementLine(MiniFlaskParser.StatementLineContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
 	@Override public T visitFlaskImportStmt(MiniFlaskParser.FlaskImportStmtContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}

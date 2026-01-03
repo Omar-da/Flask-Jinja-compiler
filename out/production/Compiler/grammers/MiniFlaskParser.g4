@@ -2,8 +2,13 @@ parser grammar MiniFlaskParser;
 options { tokenVocab = MiniFlaskLexer; }
 
 file
-    : (statement NEWLINE)* EOF
+    : (statementLine | NEWLINE)* EOF
     ;
+
+statementLine
+    : statement NEWLINE
+    ;
+
 
 statement
     : importStmt                                  #FlaskImportStmt
@@ -39,8 +44,8 @@ routeArg
     ;
 
 funcDef
-    : DEF IDENT LPAREN params? RPAREN COLON
-        NEWLINE statement*                        #FlaskFunctionDef
+   : DEF IDENT LPAREN params? RPAREN COLON
+     NEWLINE INDENT statementLine+ DEDENT             #FlaskFunctionDef
     ;
 
 params
@@ -72,7 +77,7 @@ assign
     ;
 
 ifStmt
-    : IF expr COLON NEWLINE statement+          #FlaskIfStatement
+    : IF expr COLON NEWLINE INDENT statementLine+ DEDENT          #FlaskIfStatement
     ;
 
 returnStmt

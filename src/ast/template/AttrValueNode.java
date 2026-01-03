@@ -7,10 +7,6 @@ public class AttrValueNode extends TemplateASTNode {
 
     List<QuotedItemNode> attrValues = new ArrayList();
 
-    public AttrValueNode(int line, int column) {
-        super(line, column);
-    }
-
     public AttrValueNode(int line, int column, List<QuotedItemNode> attrValues) {
         super(line, column);
         this.attrValues = attrValues;

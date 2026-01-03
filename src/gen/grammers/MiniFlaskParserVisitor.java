@@ -17,6 +17,12 @@ public interface MiniFlaskParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitFile(MiniFlaskParser.FileContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link MiniFlaskParser#statementLine}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStatementLine(MiniFlaskParser.StatementLineContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code FlaskImportStmt}
 	 * labeled alternative in {@link MiniFlaskParser#statement}.
 	 * @param ctx the parse tree

@@ -1,0 +1,6 @@
+def foo(a, b):
+        x = a
+        return x
+z = b
+if 0 == 0 :
+c = 1 + 1

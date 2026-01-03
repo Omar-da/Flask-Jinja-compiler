@@ -2,7 +2,7 @@ package ast.builder;
 
 
 import ast.template.*;
-import ast.template.css.*;
+import ast.template.css.declaration.*;
 import ast.template.css.selector.*;
 import ast.template.expr.*;
 import ast.template.misc.TemplateArgKw;
@@ -59,6 +59,8 @@ public class TemplateASTBuilder extends MiniTemplateParserBaseVisitor<TemplateAS
         templateSymbolTable.exitScope();
         System.out.println("Exited global scope. Current scope: " + templateSymbolTable.getCurrentScope().getName());
         System.out.println();
+
+        this.templateSymbolTable.printTable();
         return root;
     }
 
@@ -643,7 +645,7 @@ public class TemplateASTBuilder extends MiniTemplateParserBaseVisitor<TemplateAS
     @Override
     public TemplateASTNode visitTemplateStyleTag(MiniTemplateParser.TemplateStyleTagContext ctx) {
 
-        TemplateCssRulesNode rules = (TemplateCssRulesNode) visit(ctx.cssRules());
+        CssRulesNode rules = (CssRulesNode) visit(ctx.cssRules());
 
         return new TemplateStyleTagNode(
                 rules,
@@ -655,10 +657,10 @@ public class TemplateASTBuilder extends MiniTemplateParserBaseVisitor<TemplateAS
     @Override
     public TemplateASTNode visitTemplateCssRules(MiniTemplateParser.TemplateCssRulesContext ctx) {
 
-        TemplateCssRulesNode rules = new TemplateCssRulesNode(ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        CssRulesNode rules = new CssRulesNode(ctx.start.getLine(), ctx.start.getCharPositionInLine());
 
         for (MiniTemplateParser.CssRuleContext ruleCtx : ctx.cssRule()) {
-            rules.rules.add((TemplateCssRuleNode) visit(ruleCtx));
+            rules.rules.add((CssRuleNode) visit(ruleCtx));
         }
 
         return rules;
@@ -667,9 +669,9 @@ public class TemplateASTBuilder extends MiniTemplateParserBaseVisitor<TemplateAS
     @Override
     public TemplateASTNode visitTemplateCssRule(MiniTemplateParser.TemplateCssRuleContext ctx) {
 
-        return new TemplateCssRuleNode(
-                (TemplateCssSelectorListNode) visit(ctx.cssSelectorList()),
-                (TemplateCssDeclarationListNode) visit(ctx.cssDeclarationList()),
+        return new CssRuleNode(
+                (CssSelectorListNode) visit(ctx.cssSelectorList()),
+                (CssDeclarationListNode) visit(ctx.cssDeclarationList()),
                 ctx.start.getLine(),
                 ctx.start.getCharPositionInLine()
         );
@@ -678,10 +680,10 @@ public class TemplateASTBuilder extends MiniTemplateParserBaseVisitor<TemplateAS
     @Override
     public TemplateASTNode visitTemplateCssDeclarationList(MiniTemplateParser.TemplateCssDeclarationListContext ctx) {
 
-        TemplateCssDeclarationListNode list = new TemplateCssDeclarationListNode(ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        CssDeclarationListNode list = new CssDeclarationListNode(ctx.start.getLine(), ctx.start.getCharPositionInLine());
 
         for (MiniTemplateParser.CssDeclarationContext d : ctx.cssDeclaration()) {
-            list.declarations.add((TemplateCssDeclarationNode) visit(d));
+            list.declarations.add((CssDeclarationNode) visit(d));
         }
 
         return list;
@@ -690,14 +692,14 @@ public class TemplateASTBuilder extends MiniTemplateParserBaseVisitor<TemplateAS
     @Override
     public TemplateASTNode visitTemplateCssDeclaration(MiniTemplateParser.TemplateCssDeclarationContext ctx) {
 
-        TemplateCssDeclarationNode decl = new TemplateCssDeclarationNode(
+        CssDeclarationNode decl = new CssDeclarationNode(
                         ctx.cssProperty().getText(),
                         ctx.start.getLine(),
                         ctx.start.getCharPositionInLine()
                 );
 
         for (MiniTemplateParser.CssValueContext v : ctx.cssValue()) {
-            decl.values.add((TemplateCssValueNode) visit(v));
+            decl.values.add((CssValueNode) visit(v));
         }
 
         return decl;
@@ -743,7 +745,7 @@ public class TemplateASTBuilder extends MiniTemplateParserBaseVisitor<TemplateAS
                 );
 
         for (MiniTemplateParser.CssValueContext v : ctx.cssValue()) {
-            fn.args.add((TemplateCssValueNode) visit(v));
+            fn.args.add((CssValueNode) visit(v));
         }
 
         return fn;
@@ -752,10 +754,10 @@ public class TemplateASTBuilder extends MiniTemplateParserBaseVisitor<TemplateAS
     @Override
     public TemplateASTNode visitTemplateCssSelectorList(MiniTemplateParser.TemplateCssSelectorListContext ctx) {
 
-        TemplateCssSelectorListNode list = new TemplateCssSelectorListNode(ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        CssSelectorListNode list = new CssSelectorListNode(ctx.start.getLine(), ctx.start.getCharPositionInLine());
 
         for (MiniTemplateParser.CssSelectorContext s : ctx.cssSelector()) {
-            list.selectors.add((TemplateCssSelectorNode) visit(s));
+            list.selectors.add((CssSelectorNode) visit(s));
         }
 
         return list;
@@ -764,17 +766,17 @@ public class TemplateASTBuilder extends MiniTemplateParserBaseVisitor<TemplateAS
     @Override
     public TemplateASTNode visitTemplateCssSelector(MiniTemplateParser.TemplateCssSelectorContext ctx) {
 
-        TemplateCssSelectorNode selector = new TemplateCssSelectorNode(
+        CssSelectorNode selector = new CssSelectorNode(
                         ctx.start.getLine(),
                         ctx.start.getCharPositionInLine()
                 );
 
         selector.units = new ArrayList<>(); // IMPORTANT if not final
 
-        selector.units.add((TemplateSelectorUnitNode) visit(ctx.selectorUnit(0)));
+        selector.units.add((SelectorUnitNode) visit(ctx.selectorUnit(0)));
 
         for (int i = 1; i < ctx.selectorUnit().size(); i++) {
-            selector.units.add((TemplateSelectorUnitNode) visit(ctx.selectorUnit(i)));
+            selector.units.add((SelectorUnitNode) visit(ctx.selectorUnit(i)));
         }
 
         return selector;
@@ -784,8 +786,8 @@ public class TemplateASTBuilder extends MiniTemplateParserBaseVisitor<TemplateAS
     public TemplateASTNode visitTemplateSelectorUnit(
             MiniTemplateParser.TemplateSelectorUnitContext ctx) {
 
-        TemplateSelectorUnitNode unit =
-                new TemplateSelectorUnitNode(
+        SelectorUnitNode unit =
+                new SelectorUnitNode(
                         ctx.start.getLine(),
                         ctx.start.getCharPositionInLine()
                 );

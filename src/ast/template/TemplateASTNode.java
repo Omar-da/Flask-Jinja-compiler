@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Base AST node class with optional line/column info and children.
  */
-public class TemplateASTNode {
+public abstract class TemplateASTNode {
     public final int line;
     public final int column;
     public final List<TemplateASTNode> children = new ArrayList<>();

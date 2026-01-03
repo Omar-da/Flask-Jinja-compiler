@@ -31,8 +31,8 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
 
         List<Stmt> statements = new ArrayList<>();
 
-        for (MiniFlaskParser.StatementContext stmtCtx : ctx.statement()) {
-            statements.add((Stmt) visit(stmtCtx));
+        for (MiniFlaskParser.StatementLineContext stmtLineCtx : ctx.statementLine()) {
+            statements.add((Stmt) visit(stmtLineCtx));
         }
 
         System.out.println("Global Scope Symbols: " + symbolTable.getCurrentScope().getSymbols().keySet());
@@ -41,10 +41,16 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
         System.out.println("Exited global scope. Current scope: " + symbolTable.getCurrentScope().getName());
 
         Token t = ctx.getStart();
-        return new FileNodeFlask(statements, t.getLine(), t.getCharPositionInLine());
+        FileNodeFlask file = new FileNodeFlask(statements, t.getLine(), t.getCharPositionInLine());
+        this.symbolTable.printTable();
+
+        return file;
     }
 
-
+    @Override
+    public FlaskASTNode visitStatementLine(MiniFlaskParser.StatementLineContext ctx) {
+        return visit(ctx.statement());
+    }
 
     @Override
     public FlaskASTNode visitFlaskAssignStmt(MiniFlaskParser.FlaskAssignStmtContext ctx) {
@@ -60,24 +66,21 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
 
         Token t = ctx.getStart();
 
-        Expr value = (Expr) visit(ctx.expr());
-
-        AssignStmt assignStmt = new AssignStmt(varName, value, t.getLine(), t.getCharPositionInLine());
-
+        // 1️⃣ Define the variable in the current scope BEFORE visiting RHS
         Symbol existing = symbolTable.getCurrentScope().getSymbols().get(varName);
-        if (existing != null) {
-            System.out.println(
-                    "Variable '" + varName + "' already exists in current scope '" +
-                            symbolTable.getCurrentScope().getName() + "'. Skipping redefine."
-            );
-        } else {
-            Symbol symbol = new Symbol(varName, SymbolKind.VARIABLE, assignStmt, t.getLine(), t.getCharPositionInLine());
+        if (existing == null) {
+            Symbol symbol = new Symbol(varName, SymbolKind.VARIABLE, null, t.getLine(), t.getCharPositionInLine());
             symbolTable.define(symbol);
-
             System.out.println("Defined variable '" + varName + "' in scope '" +
                     symbolTable.getCurrentScope().getName() + "'. Current symbols: " +
                     symbolTable.getCurrentScope().getSymbols().keySet());
         }
+
+        // 2️⃣ Visit RHS expressions (reads resolved by visitFlaskAtomName)
+        Expr value = (Expr) visit(ctx.expr());
+
+        // 3️⃣ Create AST node
+        AssignStmt assignStmt = new AssignStmt(varName, value, t.getLine(), t.getCharPositionInLine());
 
         return assignStmt;
     }
@@ -223,24 +226,23 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
 
 
     @Override
-    public FlaskASTNode visitFlaskAtomName(MiniFlaskParser.FlaskAtomNameContext ctx) {
+        public FlaskASTNode visitFlaskAtomName(MiniFlaskParser.FlaskAtomNameContext ctx) {
         String name = ctx.IDENT().getText();
         Token t = ctx.getStart();
 
-        Symbol symbol = symbolTable.resolve(name);
-
-        if (symbol == null) {
-            throw new RuntimeException(
-                    "Undefined variable '" + name + "' at line " +
-                            t.getLine() + ", column " + t.getCharPositionInLine()
-            );
-        }
-
-        System.out.println("Resolved variable '" + name + "' in scope '" +
-                symbolTable.getCurrentScope().getName() + "'. Symbol info: " + symbol);
+//        if (isRead(ctx)) {
+//            Symbol symbol = symbolTable.resolve(name);
+//            if (symbol == null) {
+//                throw new RuntimeException(
+//                        "Undefined variable '" + name + "' at line " +
+//                                t.getLine() + ", column " + t.getCharPositionInLine()
+//                );
+//            }
+//        }
 
         return new NameExpr(name, t.getLine(), t.getCharPositionInLine());
     }
+
 
 
     @Override
@@ -427,7 +429,7 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
         Token t = ctx.getStart();
         String raw = ctx.STRING().getText();
         String path = raw.substring(1, raw.length() - 1);
-        return new RouteRouteArgString(path, t.getLine(), t.getCharPositionInLine());
+        return new RouteArgString(path, t.getLine(), t.getCharPositionInLine());
     }
 
 
@@ -438,7 +440,7 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
         Expr value = (Expr) visit(ctx.expr());
         Token t = ctx.getStart();
 
-        return new RouteRouteArgKw(name, value, t.getLine(), t.getCharPositionInLine());
+        return new RouteArgKw(name, value, t.getLine(), t.getCharPositionInLine());
     }
 
     @Override
@@ -446,21 +448,12 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
         String name = ctx.IDENT().getText();
         Token t = ctx.getStart();
 
-        if (symbolTable.getCurrentScope().resolve(name) != null && symbolTable.getCurrentScope().getSymbols().containsKey(name)) {
-            throw new RuntimeException(
-                    "Function '" + name + "' already defined in current scope at line " +
-                            t.getLine() + ", column " + t.getCharPositionInLine()
-            );
-        }
-
         Symbol funcSymbol = new Symbol(name, SymbolKind.FUNCTION, null, t.getLine(), t.getCharPositionInLine());
         symbolTable.define(funcSymbol);
-        System.out.println("Defined function '" + name + "' in scope '" +
-                symbolTable.getCurrentScope().getName() + "'. Current symbols: " +
-                symbolTable.getCurrentScope().getSymbols().keySet());
+
 
         symbolTable.enterScope("function_" + name);
-        System.out.println("Entered function scope: " + symbolTable.getCurrentScope().getName());
+        System.out.println("Entered function definition scope: " + symbolTable.getCurrentScope().getName());
 
         List<Param> params = new ArrayList<>();
         if (ctx.params() != null) {
@@ -468,24 +461,25 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
             params = p.params;
 
             for (Param param : params) {
-                if (symbolTable.getCurrentScope().resolve(param.name) != null && symbolTable.getCurrentScope().getSymbols().containsKey(param.name)) {
-                    throw new RuntimeException(
-                            "Parameter '" + param.name + "' already defined in function '" + name +
-                                    "' at line " + t.getLine() + ", column " + t.getCharPositionInLine()
-                    );
-                }
-
-                Symbol paramSymbol = new Symbol(param.name, SymbolKind.VARIABLE, null, t.getLine(), t.getCharPositionInLine());
-                symbolTable.define(paramSymbol);
-                System.out.println("Defined parameter '" + param.name + "' in function '" + name +
-                        "'. Current symbols: " + symbolTable.getCurrentScope().getSymbols().keySet());
+                symbolTable.define(new Symbol(param.name, SymbolKind.VARIABLE, null, t.getLine(), t.getCharPositionInLine()));
+                System.out.println("Defined variable '" + param.name + "' in scope '" +
+                        symbolTable.getCurrentScope().getName() + "'. Current symbols: " +
+                        symbolTable.getCurrentScope().getSymbols().keySet());
             }
         }
 
         List<Stmt> body = new ArrayList<>();
-        for (MiniFlaskParser.StatementContext stmtCtx : ctx.statement()) {
-            body.add((Stmt) visit(stmtCtx));
+        for (MiniFlaskParser.StatementLineContext stmtCtx : ctx.statementLine()) {
+            if (stmtCtx.statement() != null) { // only visit if statement exists
+                Stmt stmt = (Stmt) visit(stmtCtx.statement());
+                if (stmt != null) body.add(stmt);
+            }
         }
+
+
+
+        symbolTable.exitScope();
+        System.out.println("Exited function definition scope, back to: " + symbolTable.getCurrentScope().getName());
 
         return new FuncDefStmt(name, params, body, t.getLine(), t.getCharPositionInLine());
     }
@@ -564,10 +558,14 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
 
         Expr condition = (Expr) visit(ctx.expr());
 
+        symbolTable.enterScope("if");
+
         List<Stmt> body = new ArrayList<>();
-        for (MiniFlaskParser.StatementContext sCtx : ctx.statement()) {
+        for (MiniFlaskParser.StatementLineContext sCtx : ctx.statementLine()) {
             body.add((Stmt) visit(sCtx));
         }
+
+        symbolTable.exitScope();
 
         return new IfStmt(condition, body, t.getLine(), t.getCharPositionInLine());
     }
@@ -584,11 +582,6 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
             }
         }
 
-        System.out.println("Exiting function scope: " +
-                symbolTable.getCurrentScope().getName() + ". Symbols in scope: " +
-                symbolTable.getCurrentScope().getSymbols().keySet());
-        symbolTable.exitScope();
-
         return new ReturnStmt(value, t.getLine(), t.getCharPositionInLine());
     }
 
@@ -600,5 +593,16 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
 
         return new ExprStmt(expr, t.getLine(), t.getCharPositionInLine());
     }
+
+    private boolean isRead(MiniFlaskParser.FlaskAtomNameContext ctx) {
+        ParseTree parent = ctx.getParent().getParent().getParent().getParent().getParent().getParent();
+        System.out.println(parent.getClass());
+        if (parent instanceof MiniFlaskParser.FuncDefContext) {
+            return false;
+        }
+
+        return true;
+    }
+
 
 }
