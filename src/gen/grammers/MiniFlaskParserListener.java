@@ -18,16 +18,6 @@ public interface MiniFlaskParserListener extends ParseTreeListener {
 	 */
 	void exitFile(MiniFlaskParser.FileContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link MiniFlaskParser#statementLine}.
-	 * @param ctx the parse tree
-	 */
-	void enterStatementLine(MiniFlaskParser.StatementLineContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MiniFlaskParser#statementLine}.
-	 * @param ctx the parse tree
-	 */
-	void exitStatementLine(MiniFlaskParser.StatementLineContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code FlaskImportStmt}
 	 * labeled alternative in {@link MiniFlaskParser#statement}.
 	 * @param ctx the parse tree

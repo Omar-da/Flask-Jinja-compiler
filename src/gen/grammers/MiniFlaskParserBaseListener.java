@@ -29,18 +29,6 @@ public class MiniFlaskParserBaseListener implements MiniFlaskParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterStatementLine(MiniFlaskParser.StatementLineContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitStatementLine(MiniFlaskParser.StatementLineContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterFlaskImportStmt(MiniFlaskParser.FlaskImportStmtContext ctx) { }
 	/**
 	 * {@inheritDoc}

@@ -26,6 +26,7 @@ public class SymbolTable {
         currentScope = newScope;
     }
 
+
     public void exitScope() {
         if (currentScope.getParent() != null) {
             currentScope = currentScope.getParent();
@@ -43,23 +44,30 @@ public class SymbolTable {
     public void printTable() {
         System.out.println();
         System.out.println("========== TEMPLATE SYMBOL TABLE ==========");
-        printScopeChain(currentScope);
+        printAllScopes(globalScope, 0);
         System.out.println("===========================================");
         System.out.println();
     }
 
-    private void printScopeChain(Scope scope) {
+    private void printAllScopes(Scope scope, int indent) {
         if (scope == null) return;
 
-        printScopeChain(scope.getParent()); // print parents first
-        printSingleScope(scope);
+        printSingleScope(scope, indent);
+
+        for (Scope child : scope.getChildren()) {
+            printAllScopes(child, indent + 1);
+        }
     }
 
-    private void printSingleScope(Scope scope) {
-        System.out.println("+ Scope: " + scope.getName());
+
+    private void printSingleScope(Scope scope, int indent) {
+        String prefix = "  ".repeat(indent);
+
+        System.out.println(prefix + "+ Scope: " + scope.getName());
 
         if (scope.getSymbols().isEmpty()) {
-            System.out.println("  (no symbols)");
+            System.out.println(prefix + "  (no symbols)");
+            System.out.println();
             return;
         }
 
@@ -68,25 +76,22 @@ public class SymbolTable {
         int posWidth  = 14;
 
         System.out.println(
-                "  " +
+                prefix + "  " +
                         pad("NAME", nameWidth) +
                         pad("KIND", kindWidth) +
                         pad("POSITION", posWidth)
         );
 
         System.out.println(
-                "  " +
+                prefix + "  " +
                         "-".repeat(nameWidth + kindWidth + posWidth)
         );
 
         for (Symbol s : scope.getSymbols().values()) {
-            String pos =
-                    s.line >= 0
-                            ? s.line + ":" + s.column
-                            : "-";
+            String pos = s.line + ":" + s.column;
 
             System.out.println(
-                    "  " +
+                    prefix + "  " +
                             pad(s.name, nameWidth) +
                             pad(s.kind.name(), kindWidth) +
                             pad(pos, posWidth)
@@ -95,6 +100,7 @@ public class SymbolTable {
 
         System.out.println();
     }
+
 
     private String pad(String text, int width) {
         return String.format("%-" + width + "s", text);

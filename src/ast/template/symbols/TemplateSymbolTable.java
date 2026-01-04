@@ -1,5 +1,8 @@
 package ast.template.symbols;
 
+import ast.flask.symbols.Scope;
+import ast.flask.symbols.Symbol;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -87,9 +90,10 @@ public class TemplateSymbolTable {
     }
 
     public void enterScope(String name) {
-        TemplateScope newTemplateScope = new TemplateScope(currentTemplateScope, name);
-        currentTemplateScope = newTemplateScope;
+        TemplateScope newScope = new TemplateScope(currentTemplateScope, name);
+        currentTemplateScope = newScope;
     }
+
 
     public void exitScope() {
         if (currentTemplateScope.getParent() != null) {
@@ -97,8 +101,8 @@ public class TemplateSymbolTable {
         }
     }
 
-    public void define(TemplateSymbol templateSymbol) {
-        currentTemplateScope.define(templateSymbol);
+    public void define(TemplateSymbol symbol) {
+        currentTemplateScope.define(symbol);
     }
 
     public TemplateSymbol resolve(String name) {
@@ -108,23 +112,30 @@ public class TemplateSymbolTable {
     public void printTable() {
         System.out.println();
         System.out.println("========== TEMPLATE SYMBOL TABLE ==========");
-        printScopeChain(currentTemplateScope);
+        printAllScopes(globalTemplateScope, 0);
         System.out.println("===========================================");
         System.out.println();
     }
 
-    private void printScopeChain(TemplateScope scope) {
+    private void printAllScopes(TemplateScope scope, int indent) {
         if (scope == null) return;
 
-        printScopeChain(scope.getParent()); // print parents first
-        printSingleScope(scope);
+        printSingleScope(scope, indent);
+
+        for (TemplateScope child : scope.getChildren()) {
+            printAllScopes(child, indent + 1);
+        }
     }
 
-    private void printSingleScope(TemplateScope scope) {
-        System.out.println("+ Scope: " + scope.getName());
+
+    private void printSingleScope(TemplateScope scope, int indent) {
+        String prefix = "  ".repeat(indent);
+
+        System.out.println(prefix + "+ Scope: " + scope.getName());
 
         if (scope.getSymbols().isEmpty()) {
-            System.out.println("  (no symbols)");
+            System.out.println(prefix + "  (no symbols)");
+            System.out.println();
             return;
         }
 
@@ -133,25 +144,22 @@ public class TemplateSymbolTable {
         int posWidth  = 14;
 
         System.out.println(
-                "  " +
+                prefix + "  " +
                         pad("NAME", nameWidth) +
                         pad("KIND", kindWidth) +
                         pad("POSITION", posWidth)
         );
 
         System.out.println(
-                "  " +
+                prefix + "  " +
                         "-".repeat(nameWidth + kindWidth + posWidth)
         );
 
         for (TemplateSymbol s : scope.getSymbols().values()) {
-            String pos =
-                    s.line >= 0
-                            ? s.line + ":" + s.column
-                            : "-";
+            String pos = s.line + ":" + s.column;
 
             System.out.println(
-                    "  " +
+                    prefix + "  " +
                             pad(s.name, nameWidth) +
                             pad(s.kind.name(), kindWidth) +
                             pad(pos, posWidth)
@@ -161,9 +169,8 @@ public class TemplateSymbolTable {
         System.out.println();
     }
 
+
     private String pad(String text, int width) {
         return String.format("%-" + width + "s", text);
     }
-
-
 }

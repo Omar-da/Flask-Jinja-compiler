@@ -1,17 +1,28 @@
 package ast.flask.symbols;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Scope {
     private final Map<String, Symbol> symbols = new HashMap<>();
     private final Scope parent;
     private final String name;
+    private final List<Scope> children = new ArrayList<>();
 
     public Scope(Scope parent, String name) {
         this.parent = parent;
         this.name = name;
+        if (parent != null) {
+            parent.children.add(this);
+        }
     }
+
+    public List<Scope> getChildren() {
+        return children;
+    }
+
 
     // Add a symbol to the current scope
     public void define(Symbol symbol) {

@@ -11,7 +11,7 @@ def index():
 @app.route("/product/<int:pid>")
 def show(pid):
     product = next((p for p in products if p["id"] == pid), None)
-    return render_template("show.html", product=product)
+    return render_template("show.html", product = product)
 
 @app.route("/create", methods=["GET", "POST"])
 def create():

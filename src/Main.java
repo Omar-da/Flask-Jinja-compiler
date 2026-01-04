@@ -95,30 +95,30 @@ public class Main {
                 MiniFlaskParser::new,
                 parser -> ((MiniFlaskParser) parser).file()
         );
-//
-//        parseAndPrint(
-//                "================================================================ Index Template Parse Tree ================================================================",
-//                "App/indexTemplate.txt",
-//                MiniTemplateLexer::new,
-//                MiniTemplateParser::new,
-//                parser -> ((MiniTemplateParser) parser).template()
-//        );
-//
-//        parseAndPrint(
-//                "================================================================ Create Template Parse Tree ================================================================",
-//                "App/createTemplate.txt",
-//                MiniTemplateLexer::new,
-//                MiniTemplateParser::new,
-//                parser -> ((MiniTemplateParser) parser).template()
-//        );
-//
-//        parseAndPrint(
-//                "================================================================ Show Template Parse Tree ================================================================",
-//                "App/showTemplate.txt",
-//                MiniTemplateLexer::new,
-//                MiniTemplateParser::new,
-//                parser -> ((MiniTemplateParser) parser).template()
-//        );
+
+        parseAndPrint(
+                "================================================================ Index Template Parse Tree ================================================================",
+                "App/indexTemplate.txt",
+                MiniTemplateLexer::new,
+                MiniTemplateParser::new,
+                parser -> ((MiniTemplateParser) parser).template()
+        );
+
+        parseAndPrint(
+                "================================================================ Create Template Parse Tree ================================================================",
+                "App/createTemplate.txt",
+                MiniTemplateLexer::new,
+                MiniTemplateParser::new,
+                parser -> ((MiniTemplateParser) parser).template()
+        );
+
+        parseAndPrint(
+                "================================================================ Show Template Parse Tree ================================================================",
+                "App/showTemplate.txt",
+                MiniTemplateLexer::new,
+                MiniTemplateParser::new,
+                parser -> ((MiniTemplateParser) parser).template()
+        );
     }
 
     // --------------------------------------------------
