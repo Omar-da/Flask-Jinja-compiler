@@ -11,81 +11,114 @@ import ast.flask.FlaskASTNode;
 
 public class Main {
 
-    // --------------------------------------------------
-    // Entry point
-    // --------------------------------------------------
+    // ==================================================
+    // Entry Point
+    // ==================================================
     public static void main(String[] args) throws Exception {
 
-//        printFlaskAST("================================================================ Flask AST ================================================================",
-//                "tests/FlaskTest3(scopes)");
-        // Parser Trees
         printParseTree();
 
-        printFlaskAST("================================================================ Flask AST ================================================================",
-                "App/app.txt");
-        printTemplateAST("================================================================ Index Template AST ================================================================",
-                "App/indexTemplate.txt");
-        printTemplateAST("================================================================ Create Template AST ================================================================",
-                "App/createTemplate.txt");
-        printTemplateAST("================================================================ Show Template AST ================================================================",
-                "App/showTemplate.txt");
+        printFlaskAST(
+                "================================================================ Flask AST ================================================================",
+                "App/app.txt"
+        );
+
+        printTemplateAST(
+                "================================================================ Index Template AST ================================================================",
+                "App/indexTemplate.txt"
+        );
+
+        printTemplateAST(
+                "================================================================ Create Template AST ================================================================",
+                "App/createTemplate.txt"
+        );
+
+        printTemplateAST(
+                "================================================================ Show Template AST ================================================================",
+                "App/showTemplate.txt"
+        );
 
         // Flask Tests
-        printFlaskAST("================================================================ Test 1 ================================================================",
-                "tests/FlaskTest1");
-        printFlaskAST("================================================================ Test 2 ================================================================",
-                "tests/FlaskTest2");
+        printFlaskAST(
+                "================================================================ Test 1 ================================================================",
+                "tests/FlaskTest1"
+        );
+
+        printFlaskAST(
+                "================================================================ Test 2 ================================================================",
+                "tests/FlaskTest2"
+        );
 
         // Template Tests
-        printTemplateAST("================================================================ Test 1 ================================================================",
-                "tests/JinjaTest1");
-        printTemplateAST("================================================================ Test 2 ================================================================",
-                "tests/JinjaTest2");
-        printTemplateAST("================================================================ Test 3 ================================================================",
-                "tests/JinjaTest3");
+        printTemplateAST(
+                "================================================================ Test 1 ================================================================",
+                "tests/JinjaTest1"
+        );
 
+        printTemplateAST(
+                "================================================================ Test 2 ================================================================",
+                "tests/JinjaTest2"
+        );
+
+        printTemplateAST(
+                "================================================================ Test 3 ================================================================",
+                "tests/JinjaTest3"
+        );
     }
 
+    // ==================================================
+    // AST Printing
+    // ==================================================
     private static void printFlaskAST(String title, String filePath) throws Exception {
+
         System.out.println("\n" + title);
 
         MiniFlaskParser parser = createFlaskParser(filePath);
         ParseTree tree = parser.file();
 
         FlaskASTNode ast = new FlaskASTBuilder().visit(tree);
+
         System.out.println(ast);
     }
 
     private static void printTemplateAST(String title, String filePath) throws Exception {
+
         System.out.println("\n" + title);
 
         MiniTemplateParser parser = createTemplateParser(filePath);
         ParseTree tree = parser.template();
 
         TemplateASTNode ast = new TemplateASTBuilder().visit(tree);
+
         System.out.println(ast);
     }
 
-    // --------------------------------------------------
-    // Parser creation helpers
-    // --------------------------------------------------
+    // ==================================================
+    // Parser Creation Helpers
+    // ==================================================
     private static MiniFlaskParser createFlaskParser(String filePath) throws Exception {
+
         CharStream input = CharStreams.fromFileName(filePath);
+
         MiniFlaskLexer lexer = new MiniFlaskLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
+
         return new MiniFlaskParser(tokens);
     }
 
     private static MiniTemplateParser createTemplateParser(String filePath) throws Exception {
+
         CharStream input = CharStreams.fromFileName(filePath);
+
         MiniTemplateLexer lexer = new MiniTemplateLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
+
         return new MiniTemplateParser(tokens);
     }
 
-    // --------------------------------------------------
-    // Parser tree printing (UNCHANGED LOGIC)
-    // --------------------------------------------------
+    // ==================================================
+    // Parse Tree Printing
+    // ==================================================
     private static void printParseTree() throws Exception {
 
         parseAndPrint(
@@ -121,9 +154,9 @@ public class Main {
         );
     }
 
-    // --------------------------------------------------
-    // Generic parse + print pipeline (parser tree)
-    // --------------------------------------------------
+    // ==================================================
+    // Generic Parse Pipeline
+    // ==================================================
     private static <L extends Lexer, P extends Parser> void parseAndPrint(
             String title,
             String filePath,
@@ -135,46 +168,89 @@ public class Main {
         System.out.println("\n" + title);
 
         CharStream input = CharStreams.fromFileName(filePath);
+
         L lexer = lexerFactory.create(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
+
         P parser = parserFactory.create(tokens);
 
         ParseTree tree = entryRule.parse(parser);
-        printTree(tree, parser, 0);
+
+        printTree(tree, parser);
     }
 
-    // --------------------------------------------------
-    // Pretty parse tree printer (UNCHANGED)
-    // --------------------------------------------------
-    private static void printTree(ParseTree tree, Parser parser, int depth) {
-        String indent = "  ".repeat(depth);
+    // ==================================================
+    // Pretty Tree Printer
+    // ==================================================
+    private static void printTree(ParseTree tree, Parser parser) {
+
+        printTree(tree, parser, "", true);
+    }
+
+    private static void printTree(
+            ParseTree tree,
+            Parser parser,
+            String prefix,
+            boolean isLast
+    ) {
+
+        String connector = isLast ? "└── " : "├── ";
 
         if (tree instanceof RuleContext ctx) {
-            String ruleName = parser.getRuleNames()[ctx.getRuleIndex()];
-            System.out.println(indent + ruleName);
+
+            String ruleName =
+                    parser.getRuleNames()[ctx.getRuleIndex()];
+
+            System.out.println(prefix + connector + ruleName);
+
+            String childPrefix =
+                    prefix + (isLast ? "    " : "│   ");
 
             for (int i = 0; i < tree.getChildCount(); i++) {
-                printTree(tree.getChild(i), parser, depth + 1);
+
+                boolean childIsLast =
+                        i == tree.getChildCount() - 1;
+
+                printTree(
+                        tree.getChild(i),
+                        parser,
+                        childPrefix,
+                        childIsLast
+                );
             }
         }
-        else if (tree instanceof TerminalNode tn) {
-            if (!tn.getText().equals("<EOF>")) {
-                String tokenName = parser.getVocabulary()
-                        .getSymbolicName(tn.getSymbol().getType());
+        else if (tree instanceof TerminalNode terminal) {
 
-                if (tokenName != null) {
-                    System.out.println(
-                            indent + tokenName + " → \"" + tn.getText() + "\""
-                    );
-                }
+            String text = terminal.getText();
+
+            if ("<EOF>".equals(text)) {
+                return;
             }
+
+            String tokenName =
+                    parser.getVocabulary()
+                            .getSymbolicName(
+                                    terminal.getSymbol().getType()
+                            );
+
+            if (tokenName == null) {
+                tokenName = text;
+            }
+
+            System.out.println(
+                    prefix +
+                            connector +
+                            tokenName +
+                            " → \"" +
+                            text +
+                            "\""
+            );
         }
     }
 
-
-    // --------------------------------------------------
-    // Functional helpers (parser tree only)
-    // --------------------------------------------------
+    // ==================================================
+    // Functional Interfaces
+    // ==================================================
     @FunctionalInterface
     interface LexerFactory<L extends Lexer> {
         L create(CharStream input);
