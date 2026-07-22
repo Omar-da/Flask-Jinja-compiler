@@ -13,9 +13,6 @@ public class CssClassSelectorNode extends TemplateASTNode {
 
     @Override
     public String toString() {
-        return "\nCssClassSelectorNode{ " +
-                line + ":" + column +
-                ", className='" + className + '\'' +
-                '}';
+        return String.valueOf(className);
     }
 }

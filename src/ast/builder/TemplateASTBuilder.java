@@ -663,6 +663,7 @@ public class TemplateASTBuilder extends MiniTemplateParserBaseVisitor<TemplateAS
             rules.rules.add((CssRuleNode) visit(ruleCtx));
         }
 
+        rules.addChildrenFrom(rules.rules);
         return rules;
     }
 
@@ -686,6 +687,7 @@ public class TemplateASTBuilder extends MiniTemplateParserBaseVisitor<TemplateAS
             list.declarations.add((CssDeclarationNode) visit(d));
         }
 
+        list.addChildrenFrom(list.declarations);
         return list;
     }
 
@@ -702,6 +704,7 @@ public class TemplateASTBuilder extends MiniTemplateParserBaseVisitor<TemplateAS
             decl.values.add((CssValueNode) visit(v));
         }
 
+        decl.addChildrenFrom(decl.values);
         return decl;
     }
 
@@ -748,6 +751,7 @@ public class TemplateASTBuilder extends MiniTemplateParserBaseVisitor<TemplateAS
             fn.args.add((CssValueNode) visit(v));
         }
 
+        fn.addChildrenFrom(fn.args);
         return fn;
     }
 
@@ -760,6 +764,7 @@ public class TemplateASTBuilder extends MiniTemplateParserBaseVisitor<TemplateAS
             list.selectors.add((CssSelectorNode) visit(s));
         }
 
+        list.addChildrenFrom(list.selectors);
         return list;
     }
 
@@ -779,6 +784,7 @@ public class TemplateASTBuilder extends MiniTemplateParserBaseVisitor<TemplateAS
             selector.units.add((SelectorUnitNode) visit(ctx.selectorUnit(i)));
         }
 
+        selector.addChildrenFrom(selector.units);
         return selector;
     }
 
@@ -803,6 +809,7 @@ public class TemplateASTBuilder extends MiniTemplateParserBaseVisitor<TemplateAS
             }
         }
 
+        unit.addChildrenFrom(unit.parts);
         return unit;
     }
 

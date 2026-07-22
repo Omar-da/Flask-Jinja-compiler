@@ -11,14 +11,11 @@ public class Param extends FlaskASTNode {
         super(line, column);
         this.name = name;
         this.defaultValue = defaultValue;
+        addChildrenFrom(defaultValue);
     }
 
     @Override
     public String toString() {
-        return "\nParam{ " +
-                line + ":" + column +
-                ", name='" + name + '\'' +
-                ", defaultValue=" + defaultValue +
-                '}';
+        return String.valueOf(name);
     }
 }

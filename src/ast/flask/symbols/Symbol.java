@@ -19,11 +19,6 @@ public class Symbol {
 
     @Override
     public String toString() {
-        return "Symbol{" +
-                "name='" + name + '\'' +
-                ", kind='" + kind + '\'' +
-                ", line=" + line +
-                ", column=" + column +
-                '}';
+        return String.valueOf(name);
     }
 }

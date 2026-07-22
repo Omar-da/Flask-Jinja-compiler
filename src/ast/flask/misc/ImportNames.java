@@ -12,9 +12,6 @@ public class ImportNames extends FlaskASTNode {
 
     @Override
     public String toString() {
-        return "\nImportNames{ " +
-                line + ":" + column +
-                ", names=" + names +
-                '}';
+        return String.valueOf(names);
     }
 }

@@ -10,9 +10,6 @@ public class TemplateBoolExpr extends TemplateExpr {
 
     @Override
     public String toString() {
-        return "\nTemplateBoolExpr{ " +
-                line + ":" + column +
-                ", value=" + value +
-                '}';
+        return String.valueOf(value);
     }
 }

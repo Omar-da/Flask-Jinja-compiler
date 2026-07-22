@@ -13,9 +13,6 @@ public class CssPseudoArgsNode extends TemplateASTNode {
 
     @Override
     public String toString() {
-        return "\nCssPseudoArgsNode{ " +
-                line + ":" + column +
-                ", expr=" + expr +
-                '}';
+        return String.valueOf(expr);
     }
 }

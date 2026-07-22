@@ -12,13 +12,11 @@ public class TemplateTagWithContentNode extends TemplateASTNode {
     public TemplateTagWithContentNode(List<TemplateAttrNode> attrs, int line, int column) {
         super(line, column);
         this.attrs = attrs;
+        addChildren(attrs);
     }
 
     @Override
     public String toString() {
-        return "{ " +
-                line + ":" + column +
-                ", attributes=" + attrs +
-                '}';
+        return "";
     }
 }

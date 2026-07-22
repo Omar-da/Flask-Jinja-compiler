@@ -29,6 +29,53 @@ public abstract class FlaskASTNode {
         }
     }
 
+    protected void addChildren(FlaskASTNode... nodes) {
+        if (nodes == null) {
+            return;
+        }
+
+        for (FlaskASTNode child : nodes) {
+            addChild(child);
+        }
+    }
+
+    protected void addChildren(List<? extends FlaskASTNode> children) {
+        if (children == null) {
+            return;
+        }
+
+        for (FlaskASTNode child : children) {
+            addChild(child);
+        }
+    }
+
+    protected void addChildrenFrom(Object... values) {
+        if (values == null) {
+            return;
+        }
+
+        for (Object value : values) {
+            addChildrenObject(value);
+        }
+    }
+
+    private void addChildrenObject(Object value) {
+        if (value == null) {
+            return;
+        }
+
+        if (value instanceof FlaskASTNode) {
+            addChild((FlaskASTNode) value);
+            return;
+        }
+
+        if (value instanceof Iterable<?>) {
+            for (Object item : (Iterable<?>) value) {
+                addChildrenObject(item);
+            }
+        }
+    }
+
     @Override
     public abstract String toString();
 }

@@ -8,8 +8,6 @@ public class TemplateNoneExpr extends TemplateExpr {
 
     @Override
     public String toString() {
-        return "\nTemplateNoneExpr{ " +
-                line + ":" + column +
-                '}';
+        return "";
     }
 }

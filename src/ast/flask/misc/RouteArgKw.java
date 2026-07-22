@@ -11,14 +11,11 @@ public class RouteArgKw extends FlaskASTNode implements RouteArg {
         super(line, column);
         this.name = name;
         this.value = value;
+        addChildrenFrom(value);
     }
 
     @Override
     public String toString() {
-        return "\nArg{ " +
-                line + ":" + column +
-                ", name='" + name + '\'' +
-                ", value=" + value +
-                '}';
+        return String.valueOf(name);
     }
 }

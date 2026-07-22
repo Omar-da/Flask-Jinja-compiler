@@ -10,9 +10,6 @@ public class LiteralExpr extends Expr {
     }
     @Override
     public String toString() {
-        return "\nLiteralExpr{ " +
-                line + ":" + column +
-                ", value=" + value +
-                '}';
+        return String.valueOf(value);
     }
 }

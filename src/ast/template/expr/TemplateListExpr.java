@@ -8,14 +8,12 @@ public class TemplateListExpr extends TemplateExpr {
     public TemplateListExpr(List<TemplateExpr> elements, int line, int column) {
         super(line, column);
         this.elements = elements;
+        addChildren(elements);
     }
 
     @Override
     public String toString() {
-        return "\nTemplateListExpr{ " +
-                line + ":" + column +
-                ", elements=" + elements +
-                '}';
+        return String.valueOf(elements);
     }
 
 }

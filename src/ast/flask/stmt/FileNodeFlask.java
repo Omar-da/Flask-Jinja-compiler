@@ -8,13 +8,11 @@ public class FileNodeFlask extends Stmt {
     public FileNodeFlask(List<Stmt> statements, int line, int column) {
         super(line, column);
         this.statements = statements;
+        addChildrenFrom(statements);
     }
 
     @Override
     public String toString() {
-        return "\nFileNode{ " +
-                line + ":" + column +
-                ", statements=" + statements +
-                "}";
+        return String.valueOf(statements);
     }
 }

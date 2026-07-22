@@ -9,16 +9,14 @@ public class TemplateDictPair extends TemplateASTNode {
     public final TemplateExpr value;
 
     public TemplateDictPair(String key, TemplateExpr value) {
+        super();
         this.key = key;
         this.value = value;
+        addChildren(value);
     }
 
     @Override
     public String toString() {
-        return "\nTemplateDictEntry{ " +
-                line + ":" + column +
-                "key='" + key + '\'' +
-                ", value=" + value +
-                '}';
+        return String.valueOf(value);
     }
 }

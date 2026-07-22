@@ -8,8 +8,6 @@ public class AppExpr extends Expr {
 
     @Override
     public String toString() {
-        return "\nAppExpr{ " +
-                line + ":" + column +
-                '}';
+        return "";
     }
 }

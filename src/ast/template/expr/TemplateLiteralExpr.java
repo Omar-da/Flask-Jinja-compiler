@@ -4,10 +4,7 @@ public class TemplateLiteralExpr extends TemplateExpr {
 
     @Override
     public String toString() {
-        return "\nTemplateLiteralExpr{ " +
-                line + ":" + column +
-                ", value=" + value +
-                '}';
+        return String.valueOf(value);
     }
 
     public TemplateLiteralExpr(Object value, int line, int column) {

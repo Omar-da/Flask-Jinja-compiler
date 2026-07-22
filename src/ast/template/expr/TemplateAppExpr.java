@@ -10,8 +10,6 @@ public class TemplateAppExpr extends TemplateExpr {
 
     @Override
     public String toString() {
-        return "\nTemplateAppExpr{ " +
-                line + ":" + column +
-                '}';
+        return "";
     }
 }

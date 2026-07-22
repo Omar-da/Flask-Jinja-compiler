@@ -13,9 +13,6 @@ public class CssPseudoElementNode extends TemplateASTNode {
 
     @Override
     public String toString() {
-        return "\nCssPseudoElementNode{ " +
-                line + ":" + column +
-                ", name='" + name + '\'' +
-                '}';
+        return String.valueOf(name);
     }
 }

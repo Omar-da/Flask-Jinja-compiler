@@ -9,8 +9,6 @@ public abstract class Expr extends FlaskASTNode {
 
     @Override
     public String toString() {
-        return "\nExpr{ " +
-                line + ":" + column +
-                '}';
+        return "";
     }
 }

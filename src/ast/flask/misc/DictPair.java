@@ -11,14 +11,11 @@ public class DictPair extends FlaskASTNode {
         super(line, column);
         this.key = key;
         this.value = value;
+        addChildrenFrom(value);
     }
 
     @Override
     public String toString() {
-        return "\nDictPair{ " +
-                line + ":" + column +
-                ", key=" + key +
-                ", value=" + value +
-                '}';
+        return String.valueOf(key + ": " + value);
     }
 }

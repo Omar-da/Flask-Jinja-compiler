@@ -10,15 +10,12 @@ public class PrimaryExpr extends Expr {
         super(line, column);
         this.base = base;
         this.suffixes = suffixes;
+        addChildrenFrom(base, suffixes);
     }
 
     @Override
     public String toString() {
-        return "\nPrimaryExpr{ " +
-                line + ":" + column +
-                ", base=" + base +
-                ", suffixes=" + suffixes +
-                '}';
+        return String.valueOf(base);
     }
 
 }

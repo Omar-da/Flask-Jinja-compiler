@@ -8,14 +8,12 @@ public class ListExpr extends Expr {
     public ListExpr(List<Expr> elements, int line, int column) {
         super(line, column);
         this.elements = elements;
+        addChildrenFrom(elements);
     }
 
     @Override
     public String toString() {
-        return "\nListExpr{ " +
-                line + ":" + column +
-                ", elements=" + elements +
-                '}';
+        return String.valueOf(elements);
     }
 
 }

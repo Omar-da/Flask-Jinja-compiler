@@ -6,13 +6,11 @@ public class IndexExpr extends Expr {
     public IndexExpr(Expr index, int line, int column) {
         super(line, column);
         this.index = index;
+        addChildrenFrom(index);
     }
 
     @Override
     public String toString() {
-        return "\nIndexExpr{ " +
-                line + ":" + column +
-                ", index=" + index +
-                '}';
+        return String.valueOf(index);
     }
 }

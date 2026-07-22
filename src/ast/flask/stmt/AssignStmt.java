@@ -10,14 +10,11 @@ public class AssignStmt extends Stmt {
         super(line, column);
         this.target = target;
         this.value = value;
+        addChildrenFrom(value);
     }
 
     @Override
     public String toString() {
-        return "\nAssignStmt{ " +
-                line + ":" + column +
-                ", target='" + target + '\'' +
-                ", value=" + value +
-                "}";
+        return String.valueOf(target);
     }
 }

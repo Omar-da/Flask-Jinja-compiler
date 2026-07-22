@@ -9,10 +9,7 @@ public class TemplateAttrAccessExpr extends TemplateExpr {
 
     @Override
     public String toString() {
-        return "\nTemplateAttrAccessExpr{ " +
-                line + ":" + column +
-                ", attribute=" + attribute +
-                '}';
+        return String.valueOf(attribute);
     }
 
 

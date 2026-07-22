@@ -6,9 +6,6 @@ public class CssColorNode extends CssValueNode {
 
     @Override
     public String toString() {
-        return "\nCssColorNode{ " +
-                line + ":" + column +
-                ", text='" + text + '\'' +
-                '}';
+        return String.valueOf(text);
     }
 }

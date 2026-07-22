@@ -13,15 +13,11 @@ public class FuncDefStmt extends Stmt {
         this.name = name;
         this.params = params;
         this.body = body;
+        addChildrenFrom(params, body);
     }
 
     @Override
     public String toString() {
-        return "\nFuncDefStmt{ " +
-                line + ":" + column +
-                ", name='" + name + '\'' +
-                ", params=" + params +
-                ", body=" + body +
-                "}";
+        return String.valueOf(name);
     }
 }

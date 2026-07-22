@@ -10,9 +10,6 @@ public class TypeExpr extends Expr {
 
     @Override
     public String toString() {
-        return "\nTypeExpr{ " +
-                line + ":" + column +
-                ", name='" + name + '\'' +
-                '}';
+        return String.valueOf(name);
     }
 }

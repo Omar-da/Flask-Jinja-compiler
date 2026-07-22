@@ -10,13 +10,11 @@ public class DictPairs extends FlaskASTNode {
     public DictPairs(List<DictPair> pairs, int line, int column) {
         super(line, column);
         this.pairs = pairs;
+        addChildrenFrom(pairs);
     }
 
     @Override
     public String toString() {
-        return "\nDictPairs{ " +
-                line + ":" + column +
-                ", entries=" + pairs +
-                '}';
+        return String.valueOf(pairs);
     }
 }

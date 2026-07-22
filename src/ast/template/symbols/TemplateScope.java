@@ -53,9 +53,6 @@ public class TemplateScope {
 
     @Override
     public String toString() {
-        return "Scope{" +
-                "name='" + name + '\'' +
-                ", symbols=" + symbols.keySet() +
-                '}';
+        return "";
     }
 }

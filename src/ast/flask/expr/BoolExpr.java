@@ -11,9 +11,6 @@ public class BoolExpr extends Expr {
 
     @Override
     public String toString() {
-        return "\nBoolExpr{ " +
-                line + ":" + column +
-                ", value=" + value +
-                '}';
+        return String.valueOf(value);
     }
 }

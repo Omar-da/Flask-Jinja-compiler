@@ -6,9 +6,6 @@ public class CssNumberNode extends CssValueNode {
 
     @Override
     public String toString() {
-        return "\nCssNumberNode{ " +
-                line + ":" + column +
-                ", text='" + text + '\'' +
-                '}';
+        return String.valueOf(text);
     }
 }

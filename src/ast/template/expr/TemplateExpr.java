@@ -9,8 +9,6 @@ public abstract class TemplateExpr extends TemplateASTNode {
 
     @Override
     public String toString() {
-        return "\nTemplateExpr{ " +
-                line + ":" + column +
-                '}';
+        return "";
     }
 }

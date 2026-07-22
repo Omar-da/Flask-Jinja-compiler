@@ -11,18 +11,12 @@ public class TemplatePrimaryExpr extends TemplateExpr {
         super(line, column);
         this.base = base;
         this.suffixes = suffixes;
+        addChildrenFrom(base, suffixes);
     }
 
     @Override
     public String toString() {
-        String suffixesString = "";
-        if(!suffixes.isEmpty())
-            suffixesString = ", suffixes = " + suffixes;
-        return "\nTemplatePrimaryExpr{ " +
-                line + ":" + column +
-                ", base=" + base +
-                suffixesString +
-                '}';
+        return String.valueOf(base);
     }
 
 }

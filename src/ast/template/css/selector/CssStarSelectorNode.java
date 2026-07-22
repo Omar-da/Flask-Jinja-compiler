@@ -10,8 +10,6 @@ public class CssStarSelectorNode extends TemplateASTNode {
 
     @Override
     public String toString() {
-        return "\nCssStarSelectorNode{ " +
-                line + ":" + column +
-                '}';
+        return "";
     }
 }

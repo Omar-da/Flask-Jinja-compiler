@@ -10,14 +10,12 @@ public class RouteArgs extends FlaskASTNode {
     public RouteArgs(List<RouteArg> routeArgs, int line, int column) {
         super(line, column);
         this.routeArgs = routeArgs;
+        addChildrenFrom(routeArgs);
     }
 
     @Override
     public String toString() {
-        return "\nArgs{ " +
-                line + ":" + column +
-                ", args=" + routeArgs +
-                '}';
+        return String.valueOf(routeArgs);
     }
 }
 

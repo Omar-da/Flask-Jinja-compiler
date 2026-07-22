@@ -9,13 +9,11 @@ public class TemplateJinjaVarNode extends TemplateASTNode {
     public TemplateJinjaVarNode(TemplateExpr expr, int line, int column) {
         super(line, column);
         this.expr = expr;
+        addChildren(expr);
     }
 
     @Override
     public String toString() {
-        return "\nTemplateJinjaVarNode{ " +
-                line + ":" + column +
-                ", expr=" + expr +
-                '}';
+        return "";
     }
 }

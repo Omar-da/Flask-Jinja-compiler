@@ -11,13 +11,11 @@ public class Args extends FlaskASTNode {
     public Args(List<ArgKw> argKws, int line, int column) {
         super(line, column);
         this.argKws = argKws;
+        addChildrenFrom(argKws);
     }
 
     @Override
     public String toString() {
-        return "\nTemplateArgs{ " +
-                line + ":" + column +
-                ", argKws=" + argKws +
-                '}';
+        return String.valueOf(argKws);
     }
 }

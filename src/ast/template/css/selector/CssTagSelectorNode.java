@@ -13,9 +13,6 @@ public class CssTagSelectorNode extends TemplateASTNode {
 
     @Override
     public String toString() {
-        return "\nCssTagSelectorNode{ " +
-                line + ":" + column +
-                ", tagName='" + tagName + '\'' +
-                '}';
+        return String.valueOf(tagName);
     }
 }

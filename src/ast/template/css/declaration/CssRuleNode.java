@@ -16,14 +16,11 @@ public class CssRuleNode extends TemplateASTNode {
         super(line, column);
         this.selectors = selectors;
         this.declarations = declarations;
+        addChildrenFrom(selectors, declarations);
     }
 
     @Override
     public String toString() {
-        return "\nTemplateCssRuleNode{ " +
-                line + ":" + column +
-                ", selectors=" + selectors +
-                ", declarations=" + declarations +
-                '}';
+        return String.valueOf(selectors);
     }
 }

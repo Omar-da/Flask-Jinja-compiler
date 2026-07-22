@@ -13,9 +13,6 @@ public class CssIdSelectorNode extends TemplateASTNode {
 
     @Override
     public String toString() {
-        return "\nCssIdSelectorNode{ " +
-                "id='" + id + '\'' +
-                line + ":" + column +
-                '}';
+        return String.valueOf(id);
     }
 }

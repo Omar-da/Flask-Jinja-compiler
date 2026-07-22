@@ -14,15 +14,10 @@ public class TemplateGenExpr extends TemplateExpr {
         this.var = var;
         this.iterable = iterable;
         this.condition = condition;
+        addChildren(element, iterable, condition);
     }
     @Override
     public String toString() {
-        return "\nTemplateGenExpr{ " +
-                line + ":" + column +
-                ", element=" + element +
-                ", var=" + var +
-                ", iterable=" + iterable +
-                ", condition=" + condition +
-                '}';
+        return String.valueOf(element);
     }
 }

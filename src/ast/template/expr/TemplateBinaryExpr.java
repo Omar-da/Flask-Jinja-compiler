@@ -10,16 +10,12 @@ public class TemplateBinaryExpr extends TemplateExpr {
         this.left = left;
         this.operator = operator;
         this.right = right;
+        addChildren(left, right);
     }
 
     @Override
     public String toString() {
-        return "\nTemplateBinaryExpr{ " +
-                line + ":" + column +
-                ", left=" + left +
-                ", operator='" + operator + '\'' +
-                ", right=" + right +
-                '}';
+        return String.valueOf(operator);
     }
 
 }

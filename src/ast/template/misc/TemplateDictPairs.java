@@ -10,13 +10,11 @@ public class TemplateDictPairs extends TemplateASTNode {
     public TemplateDictPairs(List<TemplateDictPair> pairs, int line, int column) {
         super(line, column);
         this.pairs = pairs;
+        addChildren(pairs);
     }
 
     @Override
     public String toString() {
-        return "\nTemplateDictPairs{ " +
-                line + ":" + column +
-                ", entries=" + pairs +
-                '}';
+        return String.valueOf(pairs);
     }
 }

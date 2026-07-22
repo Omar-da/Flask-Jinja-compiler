@@ -16,6 +16,7 @@ public class TemplateJinjaBlockNode extends TemplateElementNode {
         this.type = type;
         this.varName = varName;
         this.conditionOrIterable = conditionOrIterable;
+        addChildren(conditionOrIterable);
     }
 
     public TemplateJinjaBlockNode(String type, String varName, TemplateExpr conditionOrIterable, int line, int column) {
@@ -23,16 +24,11 @@ public class TemplateJinjaBlockNode extends TemplateElementNode {
         this.type = type;
         this.varName = varName;
         this.conditionOrIterable = conditionOrIterable;
+        addChildren(conditionOrIterable);
     }
 
     @Override
     public String toString() {
-        return  "\nTemplateJinjaBlockNode{ " +
-                line + ":" + column +
-                ", type=" + type +
-                ", varName=" + varName +
-                ", conditionOrIterable=" + conditionOrIterable +
-                ", forLines=" + children +
-                '}';
+        return String.valueOf(type);
     }
 }

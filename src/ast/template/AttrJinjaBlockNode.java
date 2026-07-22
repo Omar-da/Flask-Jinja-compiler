@@ -10,6 +10,6 @@ public class AttrJinjaBlockNode extends QuotedItemNode {
 
     @Override
     public String toString() {
-        return block.toString();
+        return String.valueOf(block);
     }
 }

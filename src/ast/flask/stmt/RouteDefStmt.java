@@ -12,14 +12,11 @@ public class RouteDefStmt extends Stmt {
         super(line, column);
         this.routeArgs = routeArgs;
         this.function = function;
+        addChildrenFrom(routeArgs, function);
     }
 
     @Override
     public String toString() {
-        return "\nRouteDefStmt{ " +
-                line + ":" + column +
-                ", args=" + routeArgs +
-                ", function=" + function +
-                "}";
+        return String.valueOf(routeArgs);
     }
 }

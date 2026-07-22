@@ -10,14 +10,12 @@ public class AttrValueNode extends TemplateASTNode {
     public AttrValueNode(int line, int column, List<QuotedItemNode> attrValues) {
         super(line, column);
         this.attrValues = attrValues;
+        addChildren(attrValues);
     }
 
     @Override
     public String toString() {
-        return "\nAttrValueNode{ " +
-                line + ":" + column +
-                ", atrValues=" + attrValues +
-                '}';
+        return "";
     }
 }
 

@@ -10,16 +10,12 @@ public class BinaryExpr extends Expr {
         this.left = left;
         this.operator = operator;
         this.right = right;
+        addChildrenFrom(left, right);
     }
 
     @Override
     public String toString() {
-        return "\nBinaryExpr{ " +
-                line + ":" + column +
-                ", left=" + left +
-                ", operator='" + operator + '\'' +
-                ", right=" + right +
-                '}';
+        return String.valueOf(operator);
     }
 
 }

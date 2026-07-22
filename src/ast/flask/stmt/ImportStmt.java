@@ -12,9 +12,6 @@ public class ImportStmt extends Stmt {
 
     @Override
     public String toString() {
-        return "\nImportStmt{ " +
-                line + ":" + column +
-                "و names=" + names +
-                "}";
+        return String.valueOf(names);
     }
 }

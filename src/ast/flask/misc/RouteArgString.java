@@ -12,9 +12,6 @@ public class RouteArgString extends Expr implements RouteArg {
 
     @Override
     public String toString() {
-        return "\nArgString{ " +
-                line + ":" + column +
-                ", path='" + path + '\'' +
-                '}';
+        return String.valueOf(path);
     }
 }

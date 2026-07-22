@@ -10,13 +10,11 @@ public class TemplateCallExpr extends TemplateExpr {
     public TemplateCallExpr(List<TemplateArgKw> routeArgKws, int line, int column) {
         super(line, column);
         this.routeArgKws = routeArgKws;
+        addChildren(routeArgKws);
     }
 
     @Override
     public String toString() {
-        return "\nTemplateCallExpr{ " +
-                line + ":" + column +
-                ", args=" + routeArgKws +
-                '}';
+        return String.valueOf(routeArgKws);
     }
 }

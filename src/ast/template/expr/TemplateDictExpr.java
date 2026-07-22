@@ -10,13 +10,11 @@ public class TemplateDictExpr extends TemplateExpr {
     public TemplateDictExpr(List<TemplateDictPair> pairs, int line, int column) {
         super(line, column);
         this.pairs = pairs;
+        addChildren(pairs);
     }
 
     @Override
     public String toString() {
-        return "\nTemplateDictExpr{ " +
-                line + ":" + column +
-                ", pairs=" + pairs +
-                '}';
+        return String.valueOf(pairs);
     }
 }

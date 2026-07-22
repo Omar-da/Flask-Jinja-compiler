@@ -11,9 +11,6 @@ public class TemplateTextNode extends TemplateElementNode {
 
     @Override
     public String toString() {
-        return "\nTemplateTextNode{ " +
-                line + ":" + column +
-                ", text='" + text + '\'' +
-                '}';
+        return String.valueOf(text);
     }
 }

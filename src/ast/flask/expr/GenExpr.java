@@ -14,15 +14,10 @@ public class GenExpr extends Expr {
         this.var = var;
         this.iterable = iterable;
         this.condition = condition;
+        addChildrenFrom(element, iterable, condition);
     }
     @Override
     public String toString() {
-        return "\nGenExpr{ " +
-                line + ":" + column +
-                ", element=" + element +
-                ", var='" + var + '\'' +
-                ", iterable=" + iterable +
-                ", condition=" + condition +
-                '}';
+        return String.valueOf(element);
     }
 }

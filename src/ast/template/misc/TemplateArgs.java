@@ -10,13 +10,11 @@ public class TemplateArgs extends TemplateASTNode {
     public TemplateArgs(List<TemplateArgKw> templateArgKws, int line, int column) {
         super(line, column);
         this.templateArgKws = templateArgKws;
+        addChildren(templateArgKws);
     }
 
     @Override
     public String toString() {
-        return "\nTemplateArgs{" +
-                line + ":" + column +
-                ", argKws=" + templateArgKws +
-                '}';
+        return String.valueOf(templateArgKws);
     }
 }

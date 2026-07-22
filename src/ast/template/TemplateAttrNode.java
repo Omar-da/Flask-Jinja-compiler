@@ -9,14 +9,11 @@ public class TemplateAttrNode extends TemplateASTNode {
         super(line, column);
         this.name = name;
         this.attrValueNode = attrValueNode;
+        addChildren(attrValueNode);
     }
 
     @Override
     public String toString() {
-        return "\nTemplateAttrNode{ " +
-                line + ":" + column +
-                ", name='" + name + '\'' +
-                ", attrValueNode=" + attrValueNode +
-                '}';
+        return String.valueOf(name);
     }
 }

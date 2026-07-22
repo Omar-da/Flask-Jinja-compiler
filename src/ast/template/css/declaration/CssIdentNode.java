@@ -6,9 +6,6 @@ public class CssIdentNode extends CssValueNode {
 
     @Override
     public String toString() {
-        return "\nCssIdentNode{ " +
-                line + ":" + column +
-                ", text='" + text + '\'' +
-                '}';
+        return String.valueOf(text);
     }
 }

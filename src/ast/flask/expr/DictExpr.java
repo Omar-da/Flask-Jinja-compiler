@@ -10,13 +10,11 @@ public class DictExpr extends Expr {
     public DictExpr(List<DictPair> pairs, int line, int column) {
         super(line, column);
         this.pairs = pairs;
+        addChildrenFrom(pairs);
     }
 
     @Override
     public String toString() {
-        return "\nDictExpr{ " +
-                line + ":" + column +
-                ", pairs=" + pairs +
-                '}';
+        return String.valueOf(pairs);
     }
 }

@@ -1,9 +1,9 @@
 package ast.template.css.declaration;
 
-import ast.template.TemplateASTNode;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import ast.template.TemplateASTNode;
 
 public class CssDeclarationNode extends TemplateASTNode {
     public final String property;
@@ -12,14 +12,11 @@ public class CssDeclarationNode extends TemplateASTNode {
     public CssDeclarationNode(String property, int line, int column) {
         super(line, column);
         this.property = property;
+        addChildrenFrom(values);
     }
 
     @Override
     public String toString() {
-        return "\nTemplateCssDeclarationNode{ " +
-                line + ":" + column +
-                ", property='" + property + '\'' +
-                ", values=" + values +
-                '}';
+        return String.valueOf(property);
     }
 }

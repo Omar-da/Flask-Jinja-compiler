@@ -8,13 +8,11 @@ public class TemplateIndexExpr extends TemplateExpr {
     public TemplateIndexExpr(TemplateExpr index, int line, int column) {
         super(line, column);
         this.index = index;
+        addChildren(index);
     }
 
     @Override
     public String toString() {
-        return "\nTemplateIndexExpr{ " +
-                line + ":" + column +
-                ", index=" + index +
-                '}';
+        return String.valueOf(index);
     }
 }

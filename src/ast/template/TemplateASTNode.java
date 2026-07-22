@@ -1,7 +1,5 @@
 package ast.template;
 
-import ast.flask.FlaskASTNode;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,12 +28,56 @@ public abstract class TemplateASTNode {
         if (child != null) children.add(child);
     }
 
+    public void addChildren(TemplateASTNode... nodes) {
+        if (nodes == null) {
+            return;
+        }
+
+        for (TemplateASTNode child : nodes) {
+            addChild(child);
+        }
+    }
+
+    public void addChildren(Iterable<? extends TemplateASTNode> nodes) {
+        if (nodes == null) {
+            return;
+        }
+
+        for (TemplateASTNode node : nodes) {
+            addChild(node);
+        }
+    }
+
+    public void addChildrenFrom(Object... values) {
+        if (values == null) {
+            return;
+        }
+
+        for (Object value : values) {
+            addChildrenObject(value);
+        }
+    }
+
+    private void addChildrenObject(Object value) {
+        if (value == null) {
+            return;
+        }
+
+        if (value instanceof TemplateASTNode) {
+            addChild((TemplateASTNode) value);
+            return;
+        }
+
+        if (value instanceof Iterable<?>) {
+            for (Object item : (Iterable<?>) value) {
+                addChildrenObject(item);
+            }
+        }
+    }
+
     @Override
     public String toString() {
-        return  "ASTNode{ " +
-                line + ":" + column +
-                ", children=" + children +
-                '}';
+        return "";
     }
 
 }

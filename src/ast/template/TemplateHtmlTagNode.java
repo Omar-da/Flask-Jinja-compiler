@@ -5,7 +5,6 @@ import java.util.List;
 public class TemplateHtmlTagNode extends TemplateElementNode {
     public final String tagName;
     public final TemplateTagWithContentNode tagContent;
-    public final List<TemplateASTNode> children;
 
     public TemplateHtmlTagNode(
             String tagName,
@@ -17,19 +16,11 @@ public class TemplateHtmlTagNode extends TemplateElementNode {
         super(line, column);
         this.tagName = tagName;
         this.tagContent = tagContent;
-        this.children = children;
+        addChildrenFrom(tagContent, children);
     }
 
     @Override
     public String toString() {
-        String tagAttrsSting = "";
-        if(!tagContent.attrs.isEmpty())
-            tagAttrsSting = ", tagAttrs = " + tagContent;
-        return "\nTemplateHtmlTagNode{ " +
-                line + ":" + column +
-                ", tagName='" + tagName + '\'' +
-                tagAttrsSting +
-                ", tagContent=" + children +
-                '}';
+        return String.valueOf(tagName);
     }
 }

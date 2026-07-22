@@ -9,10 +9,7 @@ public class TemplateNameExpr extends TemplateExpr {
 
     @Override
     public String toString() {
-        return "\nTemplateNameExpr{ " +
-                line + ":" + column +
-                ", name='" + name + '\'' +
-                '}';
+        return String.valueOf(name);
     }
 
 }

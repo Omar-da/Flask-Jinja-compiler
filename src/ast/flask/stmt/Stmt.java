@@ -9,8 +9,6 @@ public abstract class Stmt extends FlaskASTNode {
 
     @Override
     public String toString() {
-        return "\nStmt{ " +
-                line + ":" + column +
-                '}';
+        return "";
     }
 }

@@ -11,14 +11,11 @@ public class TemplateArgKw extends TemplateASTNode {
         super(line, column);
         this.name = name;
         this.value = value;
+        addChildren(value);
     }
 
     @Override
     public String toString() {
-        return "\nTemplateArgKw{ " +
-                line + ":" + column +
-                ", name='" + name + '\'' +
-                ", value=" + value +
-                '}';
+        return String.valueOf(name);
     }
 }

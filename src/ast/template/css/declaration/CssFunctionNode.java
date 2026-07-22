@@ -10,14 +10,11 @@ public class CssFunctionNode extends CssValueNode {
     public CssFunctionNode(String name, int line, int column) {
         super(line,column);
         this.name = name;
+        addChildrenFrom(args);
     }
 
     @Override
     public String toString() {
-        return "\nCssFunctionNode{ " +
-                line + ":" + column +
-                ", name='" + name + '\'' +
-                ", args=" + args +
-                '}';
+        return String.valueOf(name);
     }
 }

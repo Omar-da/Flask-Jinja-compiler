@@ -14,10 +14,6 @@ public class FromImportStmt extends Stmt {
 
     @Override
     public String toString() {
-        return "\nFromImportStmt{ " +
-                line + ":" + column +
-                ", module='" + module + '\'' +
-                ", names=" + names +
-                "}";
+        return String.valueOf(module + ", " + names);
     }
 }

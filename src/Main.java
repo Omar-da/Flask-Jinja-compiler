@@ -1,4 +1,6 @@
+import ast.flask.FlaskASTPrinter;
 import ast.template.TemplateASTNode;
+import ast.template.TemplateASTPrinter;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 import gen.grammers.MiniFlaskLexer;
@@ -78,7 +80,7 @@ public class Main {
 
         FlaskASTNode ast = new FlaskASTBuilder().visit(tree);
 
-        System.out.println(ast);
+        FlaskASTPrinter.print(ast);
     }
 
     private static void printTemplateAST(String title, String filePath) throws Exception {
@@ -90,7 +92,7 @@ public class Main {
 
         TemplateASTNode ast = new TemplateASTBuilder().visit(tree);
 
-        System.out.println(ast);
+        TemplateASTPrinter.print(ast);
     }
 
     // ==================================================

@@ -8,13 +8,11 @@ public class TemplateStyleTagNode extends TemplateElementNode {
     public TemplateStyleTagNode(CssRulesNode rules, int line, int column) {
         super(line, column);
         this.rules = rules;
+        addChildren(rules);
     }
 
     @Override
     public String toString() {
-        return "\nTemplateStyleTagNode{ " +
-                line + ":" + column +
-                ", rules=" + rules +
-                '}';
+        return String.valueOf(rules);
     }
 }

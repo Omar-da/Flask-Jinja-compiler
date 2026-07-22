@@ -13,9 +13,6 @@ public class CssPseudoAtomNode extends TemplateASTNode {
 
     @Override
     public String toString() {
-        return "\nCssPseudoAtomNode{ " +
-                line + ":" + column +
-                ", text='" + text + '\'' +
-                '}';
+        return String.valueOf(text);
     }
 }

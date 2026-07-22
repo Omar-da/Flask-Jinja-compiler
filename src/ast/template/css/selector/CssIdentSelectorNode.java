@@ -13,9 +13,6 @@ public class CssIdentSelectorNode extends TemplateASTNode {
 
     @Override
     public String toString() {
-        return "\nCssIdentSelectorNode{ " +
-                line + ":" + column +
-                ", name='" + name + '\'' +
-                '}';
+        return String.valueOf(name);
     }
 }

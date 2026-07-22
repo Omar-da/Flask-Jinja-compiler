@@ -11,14 +11,11 @@ public class CssPseudoClassNode extends TemplateASTNode {
         super(line, column);
         this.name = name;
         this.args = args;
+        addChildren(args);
     }
 
     @Override
     public String toString() {
-        return "\nCssPseudoClassNode{ " +
-                line + ":" + column +
-                ", name='" + name + '\'' +
-                ", args=" + args +
-                '}';
+        return String.valueOf(name);
     }
 }

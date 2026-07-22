@@ -10,10 +10,7 @@ public class NameExpr extends Expr {
 
     @Override
     public String toString() {
-        return "\nNameExpr{ " +
-                line + ":" + column +
-                ", name='" + name + '\'' +
-                '}';
+        return String.valueOf(name);
     }
 
 }

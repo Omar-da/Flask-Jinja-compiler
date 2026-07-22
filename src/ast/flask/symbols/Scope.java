@@ -51,9 +51,6 @@ public class Scope {
 
     @Override
     public String toString() {
-        return "Scope{" +
-                "name='" + name + '\'' +
-                ", symbols=" + symbols.keySet() +
-                '}';
+        return "";
     }
 }

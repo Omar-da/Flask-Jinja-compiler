@@ -10,10 +10,7 @@ public class AttrTextNode extends QuotedItemNode {
 
     @Override
     public String toString() {
-        return "\nAttrTextNode{ " +
-                line + ":" + column +
-                ", text='" + text + '\'' +
-                '}';
+        return String.valueOf(text);
     }
 }
 

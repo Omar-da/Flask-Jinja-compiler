@@ -10,13 +10,11 @@ public class CssPseudoExprNode extends TemplateASTNode {
 
     public CssPseudoExprNode(int line, int column) {
         super(line, column);
+        addChildren(atoms);
     }
 
     @Override
     public String toString() {
-        return "\nCssPseudoExprNode{ " +
-                line + ":" + column +
-                ", atoms=" + atoms +
-                '}';
+        return "";
     }
 }

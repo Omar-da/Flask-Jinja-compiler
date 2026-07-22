@@ -7,13 +7,13 @@ import java.util.List;
 
 public class SelectorUnitNode extends TemplateASTNode {
     public final List<TemplateASTNode> parts = new ArrayList<>();
-    public SelectorUnitNode(int line, int column) { super(line,column); }
+    public SelectorUnitNode(int line, int column) {
+        super(line, column);
+        addChildrenFrom(parts);
+    }
 
     @Override
     public String toString() {
-        return "\nTemplateSelectorUnitNode{ " +
-                line + ":" + column +
-                ", parts=" + parts +
-                '}';
+        return "";
     }
 }

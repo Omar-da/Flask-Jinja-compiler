@@ -11,14 +11,11 @@ public class IfStmt extends Stmt {
         super(line, column);
         this.condition = condition;
         this.body = body;
+        addChildrenFrom(condition, body);
     }
 
     @Override
     public String toString() {
-        return "\nIfStmt{ " +
-                line + ":" + column +
-                ", condition=" + condition +
-                ", body=" + body +
-                "}";
+        return String.valueOf(condition);
     }
 }

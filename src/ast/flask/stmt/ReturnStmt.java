@@ -8,13 +8,11 @@ public class ReturnStmt extends Stmt {
     public ReturnStmt(Expr value, int line, int column) {
         super(line, column);
         this.value = value;
+        addChildrenFrom(value);
     }
 
     @Override
     public String toString() {
-        return "\nReturnStmt{ " +
-                line + ":" + column +
-                ", value=" + value +
-                "}";
+        return String.valueOf(value);
     }
 }

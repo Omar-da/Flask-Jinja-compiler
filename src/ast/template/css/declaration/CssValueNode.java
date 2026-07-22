@@ -9,8 +9,6 @@ public abstract class CssValueNode extends TemplateASTNode {
 
     @Override
     public String toString() {
-        return "\nTemplateCssValueNode{ " +
-                line + ":" + column +
-                '}';
+        return "";
     }
 }
