@@ -598,14 +598,14 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
         return new ExprStmt(expr, t.getLine(), t.getCharPositionInLine());
     }
 
-    private boolean isRead(MiniFlaskParser.FlaskAtomNameContext ctx) {
-        ParseTree parent = ctx.getParent().getParent().getParent().getParent().getParent().getParent();
-        if (parent instanceof MiniFlaskParser.FuncDefContext) {
-            return false;
-        }
-
-        return true;
-    }
+//    private boolean isRead(MiniFlaskParser.FlaskAtomNameContext ctx) {
+//        ParseTree parent = ctx.getParent().getParent().getParent().getParent().getParent().getParent();
+//        if (parent instanceof MiniFlaskParser.FuncDefContext) {
+//            return false;
+//        }
+//
+//        return true;
+//    }
 
 
 }
