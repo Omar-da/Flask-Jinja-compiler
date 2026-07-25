@@ -31,6 +31,10 @@ public class SymbolTable {
         if (currentScope.getParent() != null) {
             currentScope = currentScope.getParent();
         }
+        else
+        {
+//            throw new IllegalStateException("Cannot exit the global scope.");
+        }
     }
 
     public void define(Symbol symbol) {

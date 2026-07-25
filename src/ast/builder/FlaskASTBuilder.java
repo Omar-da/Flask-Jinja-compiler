@@ -222,7 +222,6 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
         String name = ctx.IDENT().getText();
         Token t = ctx.getStart();
 
-        if (isRead(ctx)) {
             Symbol symbol = symbolTable.resolve(name);
             if (symbol == null) {
                 throw new RuntimeException(
@@ -232,7 +231,6 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
             }
             System.out.println("Resolved variable '" + name + "' in scope '" +
                     symbolTable.getCurrentScope().getName() + "'. Symbol info: " + symbol);
-        }
 
 
         return new NameExpr(name, t.getLine(), t.getCharPositionInLine());
@@ -443,9 +441,16 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
         String name = ctx.IDENT().getText();
         Token t = ctx.getStart();
 
+        if (symbolTable.getCurrentScope().resolve(name) != null &&
+                symbolTable.getCurrentScope().getSymbols().containsKey(name)) {
+            throw new RuntimeException(
+                    "Function '" + name + "' already defined in current scope at line " +
+                            t.getLine() + ", column " + t.getCharPositionInLine()
+            );
+        }
+
         Symbol funcSymbol = new Symbol(name, SymbolKind.FUNCTION, null, t.getLine(), t.getCharPositionInLine());
         symbolTable.define(funcSymbol);
-
 
         symbolTable.enterScope(name);
         System.out.println("Entered function definition scope: " + symbolTable.getCurrentScope().getName());
@@ -456,6 +461,14 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
             params = p.params;
 
             for (Param param : params) {
+                if (symbolTable.getCurrentScope().resolve(param.name) != null &&
+                        symbolTable.getCurrentScope().getSymbols().containsKey(param.name)) {
+                    throw new RuntimeException(
+                            "Parameter '" + param.name + "' already defined in current scope at line " +
+                                    t.getLine() + ", column " + t.getCharPositionInLine()
+                    );
+                }
+
                 symbolTable.define(new Symbol(param.name, SymbolKind.VARIABLE, null, t.getLine(), t.getCharPositionInLine()));
                 System.out.println("Defined variable '" + param.name + "' in scope '" +
                         symbolTable.getCurrentScope().getName() + "'. Current symbols: " +

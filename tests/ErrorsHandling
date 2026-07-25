@@ -1,0 +1,10 @@
+from x import y, y
+
+return
+
+def func(a, a):
+    return 1
+
+def func():
+    b = a
+    return 2
