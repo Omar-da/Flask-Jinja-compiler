@@ -1,6 +1,9 @@
 import ast.flask.FlaskASTPrinter;
 import ast.template.TemplateASTNode;
 import ast.template.TemplateASTPrinter;
+import codegen.python.PythonInterpreter;
+import codegen.python.RuntimeContext;
+
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 import gen.grammers.MiniFlaskLexer;
@@ -57,6 +60,13 @@ public class Main {
                 "tests/FlaskTest2"
         );
 
+        // Runtime Context Test
+        printRuntimeContextAST(
+                "================================================================ Runtime Context Test (AST) ================================================================",
+                "tests/RuntimeContextTest"
+        );
+        
+
         // Template Tests
         printTemplateAST(
                 "================================================================ Test 1 ================================================================",
@@ -91,14 +101,34 @@ public class Main {
 
     private static void printTemplateAST(String title, String filePath) throws Exception {
 
+            System.out.println("\n" + title);
+
+            MiniTemplateParser parser = createTemplateParser(filePath);
+            ParseTree tree = parser.template();
+
+            TemplateASTNode ast = new TemplateASTBuilder().visit(tree);
+
+            TemplateASTPrinter.print(ast);
+    }
+    
+    private static void printRuntimeContextAST(String title, String filePath) throws Exception {
+
         System.out.println("\n" + title);
 
-        MiniTemplateParser parser = createTemplateParser(filePath);
-        ParseTree tree = parser.template();
+        MiniFlaskParser parser = createFlaskParser(filePath);
+        ParseTree tree = parser.file();
 
-        TemplateASTNode ast = new TemplateASTBuilder().visit(tree);
+        FlaskASTNode ast = new FlaskASTBuilder().visit(tree);
 
-        TemplateASTPrinter.print(ast);
+        FlaskASTPrinter.print(ast);
+
+        PythonInterpreter interpreter = new PythonInterpreter();
+
+        RuntimeContext context = interpreter.execute(ast);
+
+
+        System.out.println("Runtime Context:");
+        System.out.println(context);
     }
 
     // ==================================================
@@ -159,6 +189,14 @@ public class Main {
                 MiniTemplateLexer::new,
                 MiniTemplateParser::new,
                 parser -> ((MiniTemplateParser) parser).template()
+        );
+
+        parseAndPrint(
+                "================================================================ Runtime Context Test (Parser) ================================================================",
+                "tests/RuntimeContextTest",
+                MiniFlaskLexer::new,
+                MiniFlaskParser::new,
+                parser -> ((MiniFlaskParser) parser).file()
         );
     }
 

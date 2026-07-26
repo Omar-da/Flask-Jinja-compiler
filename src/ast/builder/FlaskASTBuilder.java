@@ -241,13 +241,26 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
     @Override
     public FlaskASTNode visitFlaskAtomString(MiniFlaskParser.FlaskAtomStringContext ctx) {
         Token t = ctx.getStart();
-        return new LiteralExpr(ctx.STRING().getText(), t.getLine(), t.getCharPositionInLine());
+        return new LiteralExpr(ctx.STRING().getText(), LiteralType.STRING, t.getLine(), t.getCharPositionInLine());
     }
 
     @Override
     public FlaskASTNode visitFlaskAtomNumber(MiniFlaskParser.FlaskAtomNumberContext ctx) {
         Token t = ctx.getStart();
-        return new LiteralExpr(ctx.NUMBER().getText(), t.getLine(), t.getCharPositionInLine());
+        String text = ctx.NUMBER().getText();
+
+        Object value;
+        LiteralType type;
+
+        if (text.contains(".")) {
+            value = Double.parseDouble(text);
+            type = LiteralType.FLOAT;
+        } else {
+            value = Integer.parseInt(text);
+            type = LiteralType.INTEGER;
+        }
+
+        return new LiteralExpr(value, type, t.getLine(), t.getCharPositionInLine());
     }
 
     @Override

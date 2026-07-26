@@ -1,0 +1,9 @@
+name = "Omar"
+age = 25
+isOnline = True
+operation = 1 + 1
+products = {first : "Laptop", second : "Phone"]
+numbers = [1, 2, 3]
+attr = products.first
+index = numbers[0]
+Age = age
