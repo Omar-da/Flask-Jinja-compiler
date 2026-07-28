@@ -27,13 +27,14 @@ public class SymbolTable {
     }
 
 
-    public void exitScope() {
+    public boolean exitScope() {
         if (currentScope.getParent() != null) {
             currentScope = currentScope.getParent();
+            return true;
         }
         else
         {
-//            throw new IllegalStateException("Cannot exit the global scope.");
+           return false;
         }
     }
 

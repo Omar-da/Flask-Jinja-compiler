@@ -35,7 +35,7 @@ public class TemplateASTBuilder extends MiniTemplateParserBaseVisitor<TemplateAS
     public TemplateASTNode visitTemplate(MiniTemplateParser.TemplateContext ctx) {
 
         templateSymbolTable.enterScope("global");
-        System.out.println("Entered global scope: " + templateSymbolTable.getCurrentScope().getName());
+//        System.out.println("Entered global scope: " + templateSymbolTable.getCurrentScope().getName());
 
         TemplateElementNode root = new TemplateElementNode(
                 ctx.start.getLine(),
@@ -54,13 +54,13 @@ public class TemplateASTBuilder extends MiniTemplateParserBaseVisitor<TemplateAS
         }
 
 
-        System.out.println("Global Scope Symbols: " + templateSymbolTable.getCurrentScope().getSymbols().keySet());
+//        System.out.println("Global Scope Symbols: " + templateSymbolTable.getCurrentScope().getSymbols().keySet());
 
         templateSymbolTable.exitScope();
-        System.out.println("Exited global scope. Current scope: " + templateSymbolTable.getCurrentScope().getName());
-        System.out.println();
+//        System.out.println("Exited global scope. Current scope: " + templateSymbolTable.getCurrentScope().getName());
+//        System.out.println();
 
-        this.templateSymbolTable.printTable();
+//        this.templateSymbolTable.printTable();
         return root;
     }
 
@@ -93,10 +93,10 @@ public class TemplateASTBuilder extends MiniTemplateParserBaseVisitor<TemplateAS
         TemplateExpr iterable = (TemplateExpr) visit(ctx.expr());
 
         templateSymbolTable.enterScope("for");
-        System.out.println(
-                "Entered for scope: " +
-                        templateSymbolTable.getCurrentScope().getName()
-        );
+//        System.out.println(
+//                "Entered for scope: " +
+//                        templateSymbolTable.getCurrentScope().getName()
+//        );
 
         Token t = ctx.getStart();
 
@@ -112,12 +112,12 @@ public class TemplateASTBuilder extends MiniTemplateParserBaseVisitor<TemplateAS
         TemplateSymbol symbol = new TemplateSymbol(varName, TemplateSymbolKind.VARIABLE, null, t.getLine(), t.getCharPositionInLine());
         templateSymbolTable.define(symbol);
 
-        System.out.println(
-                "Defined for variable '" + varName + "' in scope '" +
-                        templateSymbolTable.getCurrentScope().getName() +
-                        "'. Current symbols: " +
-                        templateSymbolTable.getCurrentScope().getSymbols().keySet()
-        );
+//        System.out.println(
+//                "Defined for variable '" + varName + "' in scope '" +
+//                        templateSymbolTable.getCurrentScope().getName() +
+//                        "'. Current symbols: " +
+//                        templateSymbolTable.getCurrentScope().getSymbols().keySet()
+//        );
 
         List<TemplateElementNode> body = new ArrayList<>();
 
@@ -144,10 +144,10 @@ public class TemplateASTBuilder extends MiniTemplateParserBaseVisitor<TemplateAS
         forNode.children.addAll(body);
 
         templateSymbolTable.exitScope();
-        System.out.println(
-                "Exited for scope, back to: " +
-                        templateSymbolTable.getCurrentScope().getName()
-        );
+//        System.out.println(
+//                "Exited for scope, back to: " +
+//                        templateSymbolTable.getCurrentScope().getName()
+//        );
 
         return forNode;
     }
@@ -160,10 +160,10 @@ public class TemplateASTBuilder extends MiniTemplateParserBaseVisitor<TemplateAS
         TemplateExpr condition = (TemplateExpr) visit(ctx.expr(0));
 
         templateSymbolTable.enterScope("if");
-        System.out.println(
-                "Entered if scope: " +
-                        templateSymbolTable.getCurrentScope().getName()
-        );
+//        System.out.println(
+//                "Entered if scope: " +
+//                        templateSymbolTable.getCurrentScope().getName()
+//        );
 
         List<TemplateASTNode> ifBody = new ArrayList<>();
         for (MiniTemplateParser.ElementContext elemCtx : ctx.element()) {
@@ -181,20 +181,20 @@ public class TemplateASTBuilder extends MiniTemplateParserBaseVisitor<TemplateAS
         ifNode.children.addAll(ifBody);
 
         templateSymbolTable.exitScope();
-        System.out.println(
-                "Exited if scope, back to: " +
-                        templateSymbolTable.getCurrentScope().getName()
-        );
+//        System.out.println(
+//                "Exited if scope, back to: " +
+//                        templateSymbolTable.getCurrentScope().getName()
+//        );
 
         for (int i = 1; i < ctx.expr().size(); i++) {
 
             TemplateExpr elifCondition = (TemplateExpr) visit(ctx.expr(i));
 
             templateSymbolTable.enterScope("elif");
-            System.out.println(
-                    "Entered elif scope: " +
-                            templateSymbolTable.getCurrentScope().getName()
-            );
+//            System.out.println(
+//                    "Entered elif scope: " +
+//                            templateSymbolTable.getCurrentScope().getName()
+//            );
 
             List<TemplateElementNode> elifBody = new ArrayList<>();
             for (MiniTemplateParser.ElementContext elemCtx : ctx.element()) {
@@ -207,10 +207,10 @@ public class TemplateASTBuilder extends MiniTemplateParserBaseVisitor<TemplateAS
             ifNode.children.add(elifNode);
 
             templateSymbolTable.exitScope();
-            System.out.println(
-                    "Exited elif scope, back to: " +
-                            templateSymbolTable.getCurrentScope().getName()
-            );
+//            System.out.println(
+//                    "Exited elif scope, back to: " +
+//                            templateSymbolTable.getCurrentScope().getName()
+//            );
         }
 
         return ifNode;
@@ -503,16 +503,16 @@ public class TemplateASTBuilder extends MiniTemplateParserBaseVisitor<TemplateAS
     public TemplateASTNode visitFlaskGeneratorExpr(MiniTemplateParser.FlaskGeneratorExprContext ctx) {
 
         templateSymbolTable.enterScope("generator");
-        System.out.println("Entered generator scope: " + templateSymbolTable.getCurrentScope().getName());
+//        System.out.println("Entered generator scope: " + templateSymbolTable.getCurrentScope().getName());
 
         String var = ctx.JINJA_IDENT(1).getText();
         Token t = ctx.getStart();
         TemplateSymbol symbol = new TemplateSymbol(var, TemplateSymbolKind.VARIABLE, null, t.getLine(), t.getCharPositionInLine());
         templateSymbolTable.define(symbol);
 
-        System.out.println("Defined generator variable '" + var + "' in scope '" +
-                templateSymbolTable.getCurrentScope().getName() + "'. Current symbols: " +
-                templateSymbolTable.getCurrentScope().getSymbols().keySet());
+//        System.out.println("Defined generator variable '" + var + "' in scope '" +
+//                templateSymbolTable.getCurrentScope().getName() + "'. Current symbols: " +
+//                templateSymbolTable.getCurrentScope().getSymbols().keySet());
 
 
         TemplateExpr element = (TemplateExpr) visit(ctx.expr(0));
@@ -523,7 +523,7 @@ public class TemplateASTBuilder extends MiniTemplateParserBaseVisitor<TemplateAS
 
 
         templateSymbolTable.exitScope();
-        System.out.println("Exited generator scope, back to: " + templateSymbolTable.getCurrentScope().getName());
+//        System.out.println("Exited generator scope, back to: " + templateSymbolTable.getCurrentScope().getName());
 
         return genExpr;
     }
@@ -543,8 +543,8 @@ public class TemplateASTBuilder extends MiniTemplateParserBaseVisitor<TemplateAS
             );
         }
 
-        System.out.println("Resolved variable '" + name + "' in scope '" +
-                templateSymbolTable.getCurrentScope().getName() + "'. Symbol info: " + symbol);
+//        System.out.println("Resolved variable '" + name + "' in scope '" +
+//                templateSymbolTable.getCurrentScope().getName() + "'. Symbol info: " + symbol);
 
         return new TemplateNameExpr(name, t.getLine(), t.getCharPositionInLine());
     }

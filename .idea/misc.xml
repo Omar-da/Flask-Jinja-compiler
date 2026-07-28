@@ -6,20 +6,20 @@
         <PerGrammarGenerationSettings>
           <option name="fileName" value="$PROJECT_DIR$/src/grammers/MiniFlaskParser.g4" />
           <option name="autoGen" value="true" />
-          <option name="outputDir" value="C:\Users\Dell\IdeaProjects\Compiler\src\gen" />
+          <option name="outputDir" value="C:\Users\Dell\IdeaProjects\Compiler\src" />
           <option name="libDir" value="C:\Users\Dell\IdeaProjects\Compiler\src\grammers" />
           <option name="encoding" value="" />
-          <option name="pkg" value="" />
+          <option name="pkg" value="gen.grammers" />
           <option name="language" value="Java" />
           <option name="generateVisitor" value="true" />
         </PerGrammarGenerationSettings>
         <PerGrammarGenerationSettings>
           <option name="fileName" value="$PROJECT_DIR$/src/grammers/MiniTemplateParser.g4" />
           <option name="autoGen" value="true" />
-          <option name="outputDir" value="C:\Users\Dell\IdeaProjects\Compiler\src\gen" />
+          <option name="outputDir" value="C:\Users\Dell\IdeaProjects\Compiler\src" />
           <option name="libDir" value="C:\Users\Dell\IdeaProjects\Compiler\src\grammers" />
           <option name="encoding" value="" />
-          <option name="pkg" value="" />
+          <option name="pkg" value="gen.grammers" />
           <option name="language" value="" />
           <option name="generateVisitor" value="true" />
         </PerGrammarGenerationSettings>

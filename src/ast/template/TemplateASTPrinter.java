@@ -1,52 +1,77 @@
 package ast.template;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 public class TemplateASTPrinter {
 
-    public static void print(TemplateASTNode root) {
-        if (root == null) {
-            System.out.println("(empty AST)");
-            return;
-        }
+    public static void writeJson(TemplateASTNode root, String outputPath) throws IOException {
+        Path path = Path.of(outputPath);
+        Files.createDirectories(path.getParent());
 
-        printNode(root, "", true);
+        String json = root == null ? "null" : serializeNode(root);
+        Files.writeString(path, json, StandardCharsets.UTF_8);
     }
 
-    private static void printNode(TemplateASTNode node, String prefix, boolean isLast) {
-        String connector = isLast ? "└── " : "├── ";
-        System.out.println(prefix + connector + getNodeLabel(node));
-
-        String childPrefix = prefix + (isLast ? "    " : "│   ");
-        List<TemplateASTNode> children = node.getChildren();
-        if (children == null || children.isEmpty()) {
-            return;
-        }
-
-        for (int i = 0; i < children.size(); i++) {
-            printNode(children.get(i), childPrefix, i == children.size() - 1);
-        }
+    private static String serializeNode(TemplateASTNode node) {
+        return serializeNode(node, 0);
     }
 
-    private static String getNodeLabel(TemplateASTNode node) {
+    private static String serializeNode(TemplateASTNode node, int indentLevel) {
         if (node == null) {
-            return "<null>";
+            return "null";
         }
 
-        String type = node.getClass().getSimpleName();
-        String content = node.toString();
-        boolean hasChildren = !node.getChildren().isEmpty();
-        return formatNodeLabel(type, content, node.line, node.column, hasChildren);
+        StringBuilder builder = new StringBuilder();
+        builder.append("{\n");
+        builder.append(indent(indentLevel + 1)).append("\"type\": \"").append(escapeJson(node.getClass().getSimpleName())).append("\",\n");
+        builder.append(indent(indentLevel + 1)).append("\"content\": \"").append(escapeJson(node.toString())).append("\",\n");
+        builder.append(indent(indentLevel + 1)).append("\"position\": {\n");
+        builder.append(indent(indentLevel + 2)).append("\"line\": ").append(node.line).append(",\n");
+        builder.append(indent(indentLevel + 2)).append("\"column\": ").append(node.column).append("\n");
+        builder.append(indent(indentLevel + 1)).append("},\n");
+        builder.append(indent(indentLevel + 1)).append("\"children\": [");
+
+        List<TemplateASTNode> children = node.getChildren();
+        if (children.isEmpty()) {
+            builder.append("]\n");
+        } else {
+            builder.append("\n");
+            for (int i = 0; i < children.size(); i++) {
+                builder.append(indent(indentLevel + 2)).append(serializeNode(children.get(i), indentLevel + 2));
+                if (i < children.size() - 1) {
+                    builder.append(",");
+                }
+                builder.append("\n");
+            }
+            builder.append(indent(indentLevel + 1)).append("]\n");
+        }
+
+        builder.append(indent(indentLevel)).append("}");
+        return builder.toString();
     }
 
-    private static String formatNodeLabel(String type, String content, int line, int column, boolean hasChildren) {
-        String position = line + ":" + column;
-        if (content == null || content.isBlank() || type.equals("TemplatePrimaryExpr") || type.equals("TemplateCallExpr") || type.equals("TemplateArgKw")) {
-            return type + "(" + position + ")";
+    private static String indent(int level) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < level; i++) {
+            builder.append("  ");
         }
-        if (hasChildren) {
-            return type + "(" + content + ")" + "(" + position + ")";
+        return builder.toString();
+    }
+
+    private static String escapeJson(String value) {
+        if (value == null) {
+            return "";
         }
-        return type + "(" + content + ")" + "(" + position + ")";
+
+        return value
+                .replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r")
+                .replace("\t", "\\t");
     }
 }

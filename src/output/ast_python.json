@@ -1,0 +1,455 @@
+{
+  "type": "FileNodeFlask",
+  "content": "[name, age, isOnline, operation, products, numbers, attr, index, Age]",
+  "position": {
+    "line": 1,
+    "column": 0
+  },
+  "children": [
+    {
+      "type": "AssignStmt",
+      "content": "name",
+      "position": {
+        "line": 1,
+        "column": 0
+      },
+      "children": [
+        {
+          "type": "PrimaryExpr",
+          "content": "\"Omar\"",
+          "position": {
+            "line": 1,
+            "column": 7
+          },
+          "children": [
+            {
+              "type": "LiteralExpr",
+              "content": "\"Omar\"",
+              "position": {
+                "line": 1,
+                "column": 7
+              },
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "AssignStmt",
+      "content": "age",
+      "position": {
+        "line": 2,
+        "column": 0
+      },
+      "children": [
+        {
+          "type": "PrimaryExpr",
+          "content": "25",
+          "position": {
+            "line": 2,
+            "column": 6
+          },
+          "children": [
+            {
+              "type": "LiteralExpr",
+              "content": "25",
+              "position": {
+                "line": 2,
+                "column": 6
+              },
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "AssignStmt",
+      "content": "isOnline",
+      "position": {
+        "line": 3,
+        "column": 0
+      },
+      "children": [
+        {
+          "type": "PrimaryExpr",
+          "content": "true",
+          "position": {
+            "line": 3,
+            "column": 11
+          },
+          "children": [
+            {
+              "type": "BoolExpr",
+              "content": "true",
+              "position": {
+                "line": 3,
+                "column": 11
+              },
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "AssignStmt",
+      "content": "operation",
+      "position": {
+        "line": 4,
+        "column": 0
+      },
+      "children": [
+        {
+          "type": "BinaryExpr",
+          "content": "+",
+          "position": {
+            "line": 4,
+            "column": 14
+          },
+          "children": [
+            {
+              "type": "PrimaryExpr",
+              "content": "1",
+              "position": {
+                "line": 4,
+                "column": 12
+              },
+              "children": [
+                {
+                  "type": "LiteralExpr",
+                  "content": "1",
+                  "position": {
+                    "line": 4,
+                    "column": 12
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "type": "PrimaryExpr",
+              "content": "1",
+              "position": {
+                "line": 4,
+                "column": 16
+              },
+              "children": [
+                {
+                  "type": "LiteralExpr",
+                  "content": "1",
+                  "position": {
+                    "line": 4,
+                    "column": 16
+                  },
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "AssignStmt",
+      "content": "products",
+      "position": {
+        "line": 5,
+        "column": 0
+      },
+      "children": [
+        {
+          "type": "PrimaryExpr",
+          "content": "[first: \"Laptop\", second: \"Phone\"]",
+          "position": {
+            "line": 5,
+            "column": 11
+          },
+          "children": [
+            {
+              "type": "DictExpr",
+              "content": "[first: \"Laptop\", second: \"Phone\"]",
+              "position": {
+                "line": 5,
+                "column": 11
+              },
+              "children": [
+                {
+                  "type": "DictPair",
+                  "content": "first: \"Laptop\"",
+                  "position": {
+                    "line": 5,
+                    "column": 12
+                  },
+                  "children": [
+                    {
+                      "type": "PrimaryExpr",
+                      "content": "\"Laptop\"",
+                      "position": {
+                        "line": 5,
+                        "column": 20
+                      },
+                      "children": [
+                        {
+                          "type": "LiteralExpr",
+                          "content": "\"Laptop\"",
+                          "position": {
+                            "line": 5,
+                            "column": 20
+                          },
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "DictPair",
+                  "content": "second: \"Phone\"",
+                  "position": {
+                    "line": 5,
+                    "column": 30
+                  },
+                  "children": [
+                    {
+                      "type": "PrimaryExpr",
+                      "content": "\"Phone\"",
+                      "position": {
+                        "line": 5,
+                        "column": 39
+                      },
+                      "children": [
+                        {
+                          "type": "LiteralExpr",
+                          "content": "\"Phone\"",
+                          "position": {
+                            "line": 5,
+                            "column": 39
+                          },
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "AssignStmt",
+      "content": "numbers",
+      "position": {
+        "line": 6,
+        "column": 0
+      },
+      "children": [
+        {
+          "type": "PrimaryExpr",
+          "content": "[1, 2, 3]",
+          "position": {
+            "line": 6,
+            "column": 10
+          },
+          "children": [
+            {
+              "type": "ListExpr",
+              "content": "[1, 2, 3]",
+              "position": {
+                "line": 6,
+                "column": 10
+              },
+              "children": [
+                {
+                  "type": "PrimaryExpr",
+                  "content": "1",
+                  "position": {
+                    "line": 6,
+                    "column": 11
+                  },
+                  "children": [
+                    {
+                      "type": "LiteralExpr",
+                      "content": "1",
+                      "position": {
+                        "line": 6,
+                        "column": 11
+                      },
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "type": "PrimaryExpr",
+                  "content": "2",
+                  "position": {
+                    "line": 6,
+                    "column": 14
+                  },
+                  "children": [
+                    {
+                      "type": "LiteralExpr",
+                      "content": "2",
+                      "position": {
+                        "line": 6,
+                        "column": 14
+                      },
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "type": "PrimaryExpr",
+                  "content": "3",
+                  "position": {
+                    "line": 6,
+                    "column": 17
+                  },
+                  "children": [
+                    {
+                      "type": "LiteralExpr",
+                      "content": "3",
+                      "position": {
+                        "line": 6,
+                        "column": 17
+                      },
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "AssignStmt",
+      "content": "attr",
+      "position": {
+        "line": 7,
+        "column": 0
+      },
+      "children": [
+        {
+          "type": "PrimaryExpr",
+          "content": "products",
+          "position": {
+            "line": 7,
+            "column": 7
+          },
+          "children": [
+            {
+              "type": "NameExpr",
+              "content": "products",
+              "position": {
+                "line": 7,
+                "column": 7
+              },
+              "children": []
+            },
+            {
+              "type": "AttrAccessExpr",
+              "content": "first",
+              "position": {
+                "line": 7,
+                "column": 15
+              },
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "AssignStmt",
+      "content": "index",
+      "position": {
+        "line": 8,
+        "column": 0
+      },
+      "children": [
+        {
+          "type": "PrimaryExpr",
+          "content": "numbers",
+          "position": {
+            "line": 8,
+            "column": 8
+          },
+          "children": [
+            {
+              "type": "NameExpr",
+              "content": "numbers",
+              "position": {
+                "line": 8,
+                "column": 8
+              },
+              "children": []
+            },
+            {
+              "type": "IndexExpr",
+              "content": "0",
+              "position": {
+                "line": 8,
+                "column": 15
+              },
+              "children": [
+                {
+                  "type": "PrimaryExpr",
+                  "content": "0",
+                  "position": {
+                    "line": 8,
+                    "column": 16
+                  },
+                  "children": [
+                    {
+                      "type": "LiteralExpr",
+                      "content": "0",
+                      "position": {
+                        "line": 8,
+                        "column": 16
+                      },
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "AssignStmt",
+      "content": "Age",
+      "position": {
+        "line": 9,
+        "column": 0
+      },
+      "children": [
+        {
+          "type": "PrimaryExpr",
+          "content": "age",
+          "position": {
+            "line": 9,
+            "column": 6
+          },
+          "children": [
+            {
+              "type": "NameExpr",
+              "content": "age",
+              "position": {
+                "line": 9,
+                "column": 6
+              },
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

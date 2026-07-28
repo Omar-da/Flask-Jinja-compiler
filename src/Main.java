@@ -4,11 +4,16 @@ import ast.template.TemplateASTPrinter;
 import codegen.python.PythonInterpreter;
 import codegen.python.RuntimeContext;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+import gen.grammers.MiniFlaskLexer;
+import gen.grammers.MiniFlaskParser;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
-import gen.grammers.MiniFlaskLexer;
 import gen.grammers.MiniTemplateLexer;
-import gen.grammers.MiniFlaskParser;
 import gen.grammers.MiniTemplateParser;
 import ast.builder.FlaskASTBuilder;
 import ast.builder.TemplateASTBuilder;
@@ -21,7 +26,7 @@ public class Main {
     // ==================================================
     public static void main(String[] args) throws Exception {
 
-        printParseTree();
+//        printParseTree();
 
         printFlaskAST(
                 "================================================================ Flask AST ================================================================",
@@ -44,21 +49,21 @@ public class Main {
         );
 
         // Errors Handling
-//        printFlaskAST(
-//                "================================================================ Errors Handling ================================================================",
-//                "tests/ErrorsHandling"
-//        );
+        printFlaskAST(
+                "================================================================ Errors Handling ================================================================",
+                "tests/ErrorsHandling"
+        );
 
         // Flask Tests
-        printFlaskAST(
-                "================================================================ Test 1 ================================================================",
-                "tests/FlaskTest1"
-        );
-
-        printFlaskAST(
-                "================================================================ Test 2 ================================================================",
-                "tests/FlaskTest2"
-        );
+//        printFlaskAST(
+//                "================================================================ Test 1 ================================================================",
+//                "tests/FlaskTest1"
+//        );
+//
+//        printFlaskAST(
+//                "================================================================ Test 2 ================================================================",
+//                "tests/FlaskTest2"
+//        );
 
         // Runtime Context Test
         printRuntimeContextAST(
@@ -68,20 +73,20 @@ public class Main {
         
 
         // Template Tests
-        printTemplateAST(
-                "================================================================ Test 1 ================================================================",
-                "tests/JinjaTest1"
-        );
-
-        printTemplateAST(
-                "================================================================ Test 2 ================================================================",
-                "tests/JinjaTest2"
-        );
-
-        printTemplateAST(
-                "================================================================ Test 3 ================================================================",
-                "tests/JinjaTest3"
-        );
+//        printTemplateAST(
+//                "================================================================ Test 1 ================================================================",
+//                "tests/JinjaTest1"
+//        );
+//
+//        printTemplateAST(
+//                "================================================================ Test 2 ================================================================",
+//                "tests/JinjaTest2"
+//        );
+//
+//        printTemplateAST(
+//                "================================================================ Test 3 ================================================================",
+//                "tests/JinjaTest3"
+//        );
     }
 
     // ==================================================
@@ -94,9 +99,18 @@ public class Main {
         MiniFlaskParser parser = createFlaskParser(filePath);
         ParseTree tree = parser.file();
 
-        FlaskASTNode ast = new FlaskASTBuilder().visit(tree);
+        FlaskASTBuilder builder = new FlaskASTBuilder();
+        FlaskASTNode ast = builder.visit(tree);
 
-        FlaskASTPrinter.print(ast);
+        FlaskASTPrinter.writeJson(ast, "src/output/ast_python.json");
+        System.out.println("Wrote Flask AST JSON to src/output/ast_python.json");
+
+        if (builder.hasSemanticErrors()) {
+                writeSemanticReport(builder.getSemanticErrors());
+
+                System.out.println("Semantic errors found. See semantic_report.txt");
+                return;
+        }
     }
 
     private static void printTemplateAST(String title, String filePath) throws Exception {
@@ -107,8 +121,9 @@ public class Main {
             ParseTree tree = parser.template();
 
             TemplateASTNode ast = new TemplateASTBuilder().visit(tree);
-
-            TemplateASTPrinter.print(ast);
+            String path = "src/output/ast_" + filePath.substring(filePath.lastIndexOf("/") + 1, filePath.lastIndexOf(".")) + ".json";
+            TemplateASTPrinter.writeJson(ast, path);
+            System.out.println("Wrote Template AST JSON to " + path);
     }
     
     private static void printRuntimeContextAST(String title, String filePath) throws Exception {
@@ -118,9 +133,17 @@ public class Main {
         MiniFlaskParser parser = createFlaskParser(filePath);
         ParseTree tree = parser.file();
 
-        FlaskASTNode ast = new FlaskASTBuilder().visit(tree);
+        FlaskASTBuilder builder = new FlaskASTBuilder();
+        FlaskASTNode ast = builder.visit(tree);
 
-        FlaskASTPrinter.print(ast);
+        FlaskASTPrinter.writeJson(ast, "src/output/ast_python.json");
+        System.out.println("Wrote Flask AST JSON to src/output/ast_python.json");
+
+        if (builder.hasSemanticErrors()) {
+            writeSemanticReport(builder.getSemanticErrors());
+            System.out.println("Semantic errors found. See semantic_report.txt");
+            return;
+        }
 
         PythonInterpreter interpreter = new PythonInterpreter();
 
@@ -297,6 +320,19 @@ public class Main {
     // ==================================================
     // Functional Interfaces
     // ==================================================
+    private static void writeSemanticReport(java.util.List<String> errors) throws IOException {
+        Path reportPath = Path.of("src/output/semantic_report.txt");
+        Files.createDirectories(reportPath.getParent());
+
+        StringBuilder content = new StringBuilder();
+        content.append("Semantic errors found during Flask AST build:\n");
+        for (String error : errors) {
+            content.append("- ").append(error).append("\n");
+        }
+
+        Files.writeString(reportPath, content.toString(), StandardCharsets.UTF_8);
+    }
+
     @FunctionalInterface
     interface LexerFactory<L extends Lexer> {
         L create(CharStream input);

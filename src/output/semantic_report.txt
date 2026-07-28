@@ -1,0 +1,6 @@
+Semantic errors found during Flask AST build:
+- Symbol 'y' already defined in current scope (line 1, column 0)
+- Cannot exit the global scope. (line 3, column 0)
+- Parameter 'a' already defined in current scope (line 5, column 0)
+- Function 'func' already defined in current scope (line 8, column 0)
+- Undefined variable 'a' (line 9, column 8)

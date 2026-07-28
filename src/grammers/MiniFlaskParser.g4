@@ -2,7 +2,7 @@ parser grammar MiniFlaskParser;
 options { tokenVocab = MiniFlaskLexer; }
 
 file
-    : (statement NEWLINE)* EOF
+    : (statement | statement NEWLINE | NEWLINE)* EOF NEWLINE*
     ;
 
 statement
