@@ -8,7 +8,7 @@
 
 <h1>Create Product</h1>
 
-<form method="POST">
+<form method="POST" action="{{ url_for('create_post') }}">
   <input name="name" placeholder="Product name">
   <button type="submit">Save</button>
 </form>

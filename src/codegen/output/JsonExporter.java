@@ -6,21 +6,12 @@ import java.nio.file.Path;
 
 public class JsonExporter {
 
-    public void export(
-            String fileName,
-            String json)
-            throws IOException {
+    public void export(String fileName, String json) throws IOException {
 
-        Path output =
-                Path.of(
-                        "compiler_output",
-                        fileName);
+        Path output = Path.of( "src/compiler_output", fileName);
 
-        Files.createDirectories(
-                output.getParent());
+        Files.createDirectories(output.getParent());
 
-        Files.writeString(
-                output,
-                json);
+        Files.writeString(output, json);
     }
 }

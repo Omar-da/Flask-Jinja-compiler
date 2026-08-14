@@ -6,6 +6,8 @@ IF        : 'if';
 RETURN    : 'return';
 APP       : 'app';
 ROUTE     : 'route';
+GET       : 'get';
+POST      : 'post';
 FOR       : 'for';
 IN        : 'in';
 FROM      : 'from';

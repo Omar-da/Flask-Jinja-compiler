@@ -8,6 +8,10 @@ import java.util.List;
 
 public class TemplateASTPrinter {
 
+    public static String serialize(TemplateASTNode root) {
+        return root == null ? "null" : serializeNode(root);
+    }
+
     public static void writeJson(TemplateASTNode root, String outputPath) throws IOException {
         Path path = Path.of(outputPath);
         Files.createDirectories(path.getParent());

@@ -23,6 +23,16 @@ public class RuntimeContext {
         return variables;
     }
 
+    public void putAll(Map<String, Object> values) {
+        variables.putAll(values);
+    }
+
+    public RuntimeContext copy() {
+        RuntimeContext copy = new RuntimeContext();
+        copy.putAll(variables);
+        return copy;
+    }
+
     @Override
     public String toString() {
         return variables.toString();

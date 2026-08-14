@@ -25,8 +25,14 @@ importNames
     ;
 
 routeDef
-    : AT APP DOT ROUTE LPAREN routeArgs? RPAREN
+    : AT APP DOT routeMethod LPAREN routeArgs? RPAREN
         NEWLINE funcDef                           #FlaskRouteDefinition
+    ;
+
+routeMethod
+    : ROUTE
+    | GET
+    | POST
     ;
 
 routeArgs

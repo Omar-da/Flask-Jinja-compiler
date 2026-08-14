@@ -1,5 +1,5 @@
 // Generated from C:/Users/Dell/IdeaProjects/Compiler/src/grammers/MiniFlaskLexer.g4 by ANTLR 4.13.1
-package gen.grammers;
+package grammers;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;

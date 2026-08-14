@@ -6,15 +6,11 @@ import java.nio.file.Path;
 
 public class OutputGenerator {
 
-    public void writeHtml(
-            String fileName,
-            String html) throws IOException {
+    public void writeHtml(String fileName, String html) throws IOException {
 
-        Path output =
-                Path.of("output", fileName);
+        Path output = Path.of("src/output", fileName);
 
-        Files.createDirectories(
-                output.getParent());
+        Files.createDirectories(output.getParent());
 
         Files.writeString(output, html);
     }

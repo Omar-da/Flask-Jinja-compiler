@@ -1,9 +1,0 @@
-<style>
-  body { font-family: Arial; padding: 20px; }
-  a { text-decoration:none; color:#007bff; }
-  a:hover { text-decoration:underline; }
-</style>
-
-<h1>{{ product.name }}</h1>
-
-<a href="{{ url_for('index') }}">Back</a>

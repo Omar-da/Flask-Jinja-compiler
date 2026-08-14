@@ -150,6 +150,16 @@ public interface MiniFlaskParserListener extends ParseTreeListener {
 	 */
 	void exitFlaskRouteDefinition(MiniFlaskParser.FlaskRouteDefinitionContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link MiniFlaskParser#routeMethod}.
+	 * @param ctx the parse tree
+	 */
+	void enterRouteMethod(MiniFlaskParser.RouteMethodContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MiniFlaskParser#routeMethod}.
+	 * @param ctx the parse tree
+	 */
+	void exitRouteMethod(MiniFlaskParser.RouteMethodContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code FlaskRouteArgsList}
 	 * labeled alternative in {@link MiniFlaskParser#routeArgs}.
 	 * @param ctx the parse tree

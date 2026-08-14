@@ -94,6 +94,12 @@ public interface MiniFlaskParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitFlaskRouteDefinition(MiniFlaskParser.FlaskRouteDefinitionContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link MiniFlaskParser#routeMethod}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRouteMethod(MiniFlaskParser.RouteMethodContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code FlaskRouteArgsList}
 	 * labeled alternative in {@link MiniFlaskParser#routeArgs}.
 	 * @param ctx the parse tree

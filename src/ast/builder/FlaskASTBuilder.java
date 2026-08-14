@@ -39,6 +39,20 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
         semanticErrors.add(full);
     }
 
+    private boolean isInsideFunction(ParseTree node) {
+        ParseTree current = node;
+        while (current != null) {
+            if (current instanceof MiniFlaskParser.FlaskFunctionDefContext) {
+                return true;
+            }
+            if (current instanceof MiniFlaskParser.FileContext) {
+                return false;
+            }
+            current = current.getParent();
+        }
+        return false;
+    }
+
     @Override
     public FlaskASTNode visitFile(MiniFlaskParser.FileContext ctx) {
         // Use the existing global scope defined in the SymbolTable constructor
@@ -73,13 +87,15 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
 
         Token t = ctx.getStart();
 
-        Symbol existing = symbolTable.getCurrentScope().getSymbols().get(varName);
-        if (existing == null) {
+        Symbol existingInCurrentScope = symbolTable.getCurrentScope().getSymbols().get(varName);
+        Symbol existingAnywhere = symbolTable.resolve(varName);
+        if (existingInCurrentScope == null) {
             Symbol symbol = new Symbol(varName, SymbolKind.VARIABLE, null, t.getLine(), t.getCharPositionInLine());
             symbolTable.define(symbol);
-//            System.out.println("Defined variable '" + varName + "' in scope '" +
-//                    symbolTable.getCurrentScope().getName() + "'. Current symbols: " +
-//                    symbolTable.getCurrentScope().getSymbols().keySet());
+        } else if (existingAnywhere != null && existingAnywhere != existingInCurrentScope) {
+            // allow shadowing from an outer scope while keeping the local binding visible for later references
+            Symbol symbol = new Symbol(varName, SymbolKind.VARIABLE, null, t.getLine(), t.getCharPositionInLine());
+            symbolTable.define(symbol);
         }
 
         Expr value = (Expr) visit(ctx.expr());
@@ -230,18 +246,15 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
 
 
     @Override
-        public FlaskASTNode visitFlaskAtomName(MiniFlaskParser.FlaskAtomNameContext ctx) {
+    public FlaskASTNode visitFlaskAtomName(MiniFlaskParser.FlaskAtomNameContext ctx) {
         String name = ctx.IDENT().getText();
         Token t = ctx.getStart();
 
-            Symbol symbol = symbolTable.resolve(name);
-            if (symbol == null) {
-                recordSemanticError("Undefined variable '" + name + "'", t);
-                return new NameExpr(name, t.getLine(), t.getCharPositionInLine());
-            }
-//            System.out.println("Resolved variable '" + name + "' in scope '" +
-//                    symbolTable.getCurrentScope().getName() + "'. Symbol info: " + symbol);
-
+        Symbol symbol = symbolTable.resolve(name);
+        if (symbol == null) {
+            recordSemanticError("Undefined variable '" + name + "'", t);
+            return new NameExpr(name, t.getLine(), t.getCharPositionInLine());
+        }
 
         return new NameExpr(name, t.getLine(), t.getCharPositionInLine());
     }
@@ -251,7 +264,9 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
     @Override
     public FlaskASTNode visitFlaskAtomString(MiniFlaskParser.FlaskAtomStringContext ctx) {
         Token t = ctx.getStart();
-        return new LiteralExpr(ctx.STRING().getText(), LiteralType.STRING, t.getLine(), t.getCharPositionInLine());
+        String raw = ctx.STRING().getText();
+        String value = raw.length() >= 2 ? raw.substring(1, raw.length() - 1) : raw;
+        return new LiteralExpr(value, LiteralType.STRING, t.getLine(), t.getCharPositionInLine());
     }
 
     @Override
@@ -344,7 +359,8 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
         String key;
 
         if (ctx.STRING() != null) {
-            key = ctx.STRING().getText();
+            String raw = ctx.STRING().getText();
+            key = raw.length() >= 2 ? raw.substring(1, raw.length() - 1) : raw;
         } else {
             key = ctx.IDENT().getText();
         }
@@ -419,9 +435,13 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
             routeArgs.addAll(routeArgsNode.routeArgs);
         }
 
-            FuncDefStmt function = (FuncDefStmt) visit(ctx.funcDef());
+        FuncDefStmt function = (FuncDefStmt) visit(ctx.funcDef());
+        String methodName = ctx.routeMethod() != null ? ctx.routeMethod().getText().toUpperCase() : "ANY";
+        if ("ROUTE".equals(methodName)) {
+            methodName = "ANY";
+        }
 
-        return new RouteDefStmt(routeArgs, function, t.getLine(), t.getCharPositionInLine());
+        return new RouteDefStmt(routeArgs, function, methodName, t.getLine(), t.getCharPositionInLine());
     }
 
     @Override
@@ -474,6 +494,34 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
         symbolTable.enterScope(name);
 //        System.out.println("Entered function definition scope: " + symbolTable.getCurrentScope().getName());
 
+        // First pass: predefine top-level assignment targets in this function so
+        // later references (e.g. in return/render_template) resolve correctly.
+        // This helps with patterns like: assign; return render_template(..., product=product)
+        for (MiniFlaskParser.StatementContext preStmtCtx : ctx.statement()) {
+            if (preStmtCtx instanceof MiniFlaskParser.FlaskAssignStmtContext preAssignCtx) {
+                // Fallback-safe extraction of assignment target name by parsing the statement text
+                String raw = preAssignCtx.getText();
+                int eq = raw.indexOf('=');
+                String candidate;
+                if (eq > 0) {
+                    candidate = raw.substring(0, eq);
+                } else {
+                    // fallback: some contexts return only the lhs text (e.g. "product")
+                    candidate = raw;
+                }
+                // strip possible parentheses or whitespace
+                candidate = candidate.replaceAll("[()\\s]", "");
+                // when assignment is like app = ..., IDENT or APP could be the name
+                String preVarName = candidate;
+                Token tt = preAssignCtx.getStart();
+                if (preVarName != null && !preVarName.isBlank()) {
+                    if (symbolTable.getCurrentScope().resolve(preVarName) == null) {
+                        symbolTable.define(new Symbol(preVarName, SymbolKind.VARIABLE, null, tt.getLine(), tt.getCharPositionInLine()));
+                    }
+                }
+            }
+        }
+
         List<Param> params = new ArrayList<>();
         if (ctx.params() != null) {
             Params p = (Params) visit(ctx.params());
@@ -494,12 +542,117 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
         }
 
         List<Stmt> body = new ArrayList<>();
-        for (MiniFlaskParser.StatementContext stmtCtx : ctx.statement()) {
-                Stmt stmt = (Stmt) visit(stmtCtx);
-                if (stmt != null) body.add(stmt);
+        List<MiniFlaskParser.StatementContext> statements = ctx.statement();
+        for (int i = 0; i < statements.size(); i++) {
+            MiniFlaskParser.StatementContext stmtCtx = statements.get(i);
+            Token st = stmtCtx.getStart();
+
+            if (stmtCtx instanceof MiniFlaskParser.FlaskIfStmtContext ifCtx) {
+                MiniFlaskParser.IfStmtContext ifInner = ifCtx.ifStmt();
+                if (ifInner instanceof MiniFlaskParser.FlaskIfStatementContext) {
+                }
+                IfStmtWithSiblings result = buildIfStmtWithSiblings(ifInner, statements, i + 1);
+                body.add(result.ifStmt);
+                body.addAll(result.trailingStatements);
+                i += result.consumedSiblingCount;
+                continue;
+            }
+
+            Stmt stmt = (Stmt) visit(stmtCtx);
+            if (stmt != null) body.add(stmt);
         }
 
+        symbolTable.exitScope();
         return new FuncDefStmt(name, params, body, t.getLine(), t.getCharPositionInLine());
+    }
+
+    private IfStmtWithSiblings buildIfStmtWithSiblings(MiniFlaskParser.IfStmtContext ctx) {
+        return buildIfStmtWithSiblings(ctx, null, -1);
+    }
+
+    private IfStmtWithSiblings buildIfStmtWithSiblings(MiniFlaskParser.IfStmtContext ctx,
+                                                       List<MiniFlaskParser.StatementContext> outerStatements,
+                                                       int nextIndex) {
+        MiniFlaskParser.FlaskIfStatementContext ifCtx = (MiniFlaskParser.FlaskIfStatementContext) ctx;
+        Token t = ifCtx.getStart();
+        Expr condition = (Expr) visit(ifCtx.expr());
+
+        symbolTable.enterScope("if");
+
+        int ifIndent = t.getCharPositionInLine();
+        List<Stmt> body = new ArrayList<>();
+        List<Stmt> trailingStatements = new ArrayList<>();
+        int consumedSiblingCount = 0;
+        var processedPositions = new java.util.HashSet<String>();
+
+        for (MiniFlaskParser.StatementContext sCtx : ifCtx.statement()) {
+            String positionKey = sCtx.getStart().getLine() + ":" + sCtx.getStart().getCharPositionInLine();
+            processedPositions.add(positionKey);
+
+            int stmtIndent = sCtx.getStart().getCharPositionInLine();
+            Stmt stmt = (Stmt) visit(sCtx);
+            if (stmt == null) {
+                continue;
+            }
+
+            if (stmtIndent <= ifIndent) {
+                trailingStatements.add(stmt);
+            } else {
+                body.add(stmt);
+            }
+        }
+
+        if (outerStatements != null && nextIndex >= 0) {
+            for (int i = nextIndex; i < outerStatements.size(); i++) {
+                MiniFlaskParser.StatementContext sCtx = outerStatements.get(i);
+                int stmtIndent = sCtx.getStart().getCharPositionInLine();
+                if (stmtIndent <= ifIndent) {
+                    break;
+                }
+
+                String positionKey = sCtx.getStart().getLine() + ":" + sCtx.getStart().getCharPositionInLine();
+                if (processedPositions.contains(positionKey)) {
+                    consumedSiblingCount++;
+                    continue;
+                }
+
+                if (sCtx instanceof MiniFlaskParser.FlaskIfStmtContext nestedIfCtx) {
+                    MiniFlaskParser.IfStmtContext nestedIfInner = nestedIfCtx.ifStmt();
+                    IfStmtWithSiblings nestedResult = buildIfStmtWithSiblings(nestedIfInner, outerStatements, i + 1);
+                    body.add(nestedResult.ifStmt);
+                    i += nestedResult.consumedSiblingCount;
+                    consumedSiblingCount += nestedResult.consumedSiblingCount + 1;
+                    continue;
+                }
+
+                Stmt stmt = (Stmt) visit(sCtx);
+                if (stmt != null) {
+                    body.add(stmt);
+                }
+                consumedSiblingCount++;
+            }
+        }
+
+        symbolTable.exitScope();
+
+        return new IfStmtWithSiblings(new IfStmt(condition, body, t.getLine(), t.getCharPositionInLine()), trailingStatements, consumedSiblingCount);
+    }
+
+    private static class IfStmtWithSiblings {
+        private final IfStmt ifStmt;
+        private final List<Stmt> trailingStatements;
+        private final int consumedSiblingCount;
+
+        private IfStmtWithSiblings(IfStmt ifStmt, List<Stmt> trailingStatements, int consumedSiblingCount) {
+            this.ifStmt = ifStmt;
+            this.trailingStatements = trailingStatements;
+            this.consumedSiblingCount = consumedSiblingCount;
+        }
+    }
+
+    @Override
+    public FlaskASTNode visitFlaskIfStatement(MiniFlaskParser.FlaskIfStatementContext ctx) {
+        return buildIfStmtWithSiblings(ctx).ifStmt;
     }
 
     @Override
@@ -571,26 +724,12 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
     }
 
     @Override
-    public FlaskASTNode visitFlaskIfStatement(MiniFlaskParser.FlaskIfStatementContext ctx) {
-        Token t = ctx.getStart();
-
-        Expr condition = (Expr) visit(ctx.expr());
-
-        symbolTable.enterScope("if");
-
-        List<Stmt> body = new ArrayList<>();
-        for (MiniFlaskParser.StatementContext sCtx : ctx.statement()) {
-            body.add((Stmt) visit(sCtx));
-        }
-
-        symbolTable.exitScope();
-
-        return new IfStmt(condition, body, t.getLine(), t.getCharPositionInLine());
-    }
-
-    @Override
     public FlaskASTNode visitFlaskReturnStatement(MiniFlaskParser.FlaskReturnStatementContext ctx) {
         Token t = ctx.getStart();
+
+        if (!isInsideFunction(ctx)) {
+            recordSemanticError("Return statement is not allowed in global scope", t);
+        }
 
         Expr value = null;
         for (ParseTree child : ctx.children) {
@@ -598,12 +737,6 @@ public class FlaskASTBuilder extends MiniFlaskParserBaseVisitor<FlaskASTNode> {
                 value = (Expr) visit(child);
                 break;
             }
-        }
-
-        if(!symbolTable.exitScope()) {
-            recordSemanticError("Cannot exit the global scope.", t);
-        } else {
-//            System.out.println("Exited function definition scope, back to: " + symbolTable.getCurrentScope().getName());
         }
 
         return new ReturnStmt(value, t.getLine(), t.getCharPositionInLine());

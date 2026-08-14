@@ -1,9 +1,10 @@
 package ast.flask.stmt;
 
-import ast.flask.misc.Param;
 import java.util.List;
 
-public class FuncDefStmt extends Stmt {
+import ast.flask.misc.Param;
+
+public class FuncDefStmt extends Stmt implements FunctionDefNode {
     public final String name;
     public final List<Param> params;
     public final List<Stmt> body;

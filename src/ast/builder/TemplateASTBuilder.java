@@ -633,7 +633,8 @@ public class TemplateASTBuilder extends MiniTemplateParserBaseVisitor<TemplateAS
         String key;
 
         if (ctx.JINJA_STRING() != null) {
-            key = ctx.JINJA_STRING().getText();
+            String raw = ctx.JINJA_STRING().getText();
+            key = raw.length() >= 2 ? raw.substring(1, raw.length() - 1) : raw;
         } else {
             key = ctx.JINJA_IDENT().getText();
         }

@@ -161,6 +161,18 @@ public class MiniFlaskParserBaseListener implements MiniFlaskParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterRouteMethod(MiniFlaskParser.RouteMethodContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitRouteMethod(MiniFlaskParser.RouteMethodContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterFlaskRouteArgsList(MiniFlaskParser.FlaskRouteArgsListContext ctx) { }
 	/**
 	 * {@inheritDoc}

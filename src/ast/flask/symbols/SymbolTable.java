@@ -3,6 +3,7 @@ package ast.flask.symbols;
 public class SymbolTable {
     private Scope globalScope;
     private Scope currentScope;
+    private int functionNestingDepth = 0;
 
     public SymbolTable() {
         this.globalScope = new Scope(null, "global");
@@ -19,6 +20,20 @@ public class SymbolTable {
 
     public Scope getCurrentScope() {
         return currentScope;
+    }
+
+    public boolean isInFunctionScope() {
+        return functionNestingDepth > 0;
+    }
+
+    public void enterFunctionScope() {
+        functionNestingDepth++;
+    }
+
+    public void exitFunctionScope() {
+        if (functionNestingDepth > 0) {
+            functionNestingDepth--;
+        }
     }
 
     public void enterScope(String name) {
@@ -44,6 +59,22 @@ public class SymbolTable {
 
     public Symbol resolve(String name) {
         return currentScope.resolve(name);
+    }
+
+    // Search all scopes (global and children) for a symbol with the given name.
+    public Symbol findSymbolAnywhere(String name) {
+        return findInScopeRecursive(globalScope, name);
+    }
+
+    private Symbol findInScopeRecursive(Scope scope, String name) {
+        if (scope == null) return null;
+        Symbol s = scope.getSymbols().get(name);
+        if (s != null) return s;
+        for (Scope child : scope.getChildren()) {
+            Symbol found = findInScopeRecursive(child, name);
+            if (found != null) return found;
+        }
+        return null;
     }
 
     public void printTable() {

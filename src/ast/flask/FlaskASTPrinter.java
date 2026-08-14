@@ -12,6 +12,10 @@ public class FlaskASTPrinter {
         writeJson(root, "src/output/ast_python.json");
     }
 
+    public static String serialize(FlaskASTNode root) {
+        return root == null ? "null" : serializeNode(root);
+    }
+
     public static void writeJson(FlaskASTNode root, String outputPath) throws IOException {
         Path path = Path.of(outputPath);
         Files.createDirectories(path.getParent());
