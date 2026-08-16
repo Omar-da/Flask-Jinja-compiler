@@ -48,9 +48,9 @@ public class Main {
     // ==================================================
     public static void main(String[] args) throws Exception {
 
-        // Start fresh generation log and semantic report
         Files.createDirectories(GENERATION_LOG.getParent());
         try { Files.deleteIfExists(GENERATION_LOG); } catch (IOException ignored) {}
+
         Path semanticReportPath = Path.of("src", "compiler_output", "semantic_report.txt");
         Files.createDirectories(semanticReportPath.getParent());
         Files.writeString(semanticReportPath, "", StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
@@ -100,14 +100,14 @@ public class Main {
         System.out.println("Wrote Flask AST JSON to compiler_output/ast_python.json");
 
         if (builder.hasSemanticErrors()) {
-                writeSemanticReport(builder.getSemanticErrors());
+            writeSemanticReport(builder.getSemanticErrors());
 
-                System.out.println("Semantic errors found. See semantic_report.txt");
-                return;
+            System.out.println("Semantic errors found. See semantic_report.txt");
+            return;
         }
     }
 
-    private static FlaskASTNode buildAstForFile(String filePath) throws Exception {
+    private static FlaskASTNode parseAndBuildFlaskAST(String filePath) throws Exception {
         logGenerationPhase(GENERATION_LOG, "parsing", filePath);
 
         MiniFlaskParser parser = createFlaskParser(filePath);
@@ -132,9 +132,6 @@ public class Main {
         return ast;
     }
 
-    private static FlaskASTNode parseAndBuildFlaskAST(String filePath) throws Exception {
-        return buildAstForFile(filePath);
-    }
 
     private static FlaskASTNode buildErrorsHandlingAst() throws Exception {
         String filePath = "tests/ErrorsHandling";
@@ -171,7 +168,7 @@ public class Main {
             exporter.export(path.replace("src/compiler_output/", "").replace("/", "_"), TemplateASTPrinter.serialize(ast));
             System.out.println("Wrote Template AST JSON to " + path);
     }
-    
+
     private static void generateTemplateHtmlOutputs(RuntimeContext context, Map<String, TemplateASTNode> templates) throws Exception {
         OutputGenerator outputGenerator = new OutputGenerator();
         JinjaRenderer renderer = new JinjaRenderer();
