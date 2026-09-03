@@ -295,6 +295,13 @@ public class ValueEvaluator {
                     return null;
                 }
             }
+            if ("remove".equals(attrAccess.attribute) && baseValue instanceof List<?> list) {
+                if (call.routeArgKws.size() == 1) {
+                    Object value = evaluate(call.routeArgKws.get(0).value);
+                    ((List) list).remove(value);
+                    return null;
+                }
+            }
         }
 
         if (baseExpr instanceof NameExpr nameExpr) {
@@ -372,7 +379,7 @@ public class ValueEvaluator {
             return map.get(attr.attribute);
         }
 
-        if (value instanceof List<?> list && "append".equals(attr.attribute)) {
+        if (value instanceof List<?> list && ("append".equals(attr.attribute) || "remove".equals(attr.attribute))) {
             return list;
         }
 

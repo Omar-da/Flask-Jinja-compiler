@@ -32,34 +32,26 @@ public class TemplateValueEvaluator {
         if (node instanceof TemplateLiteralExpr literal) {
             return literal.value;
         }
-
         if (node instanceof TemplateBoolExpr boolExpr) {
             return boolExpr.value;
         }
-
         if (node instanceof TemplateNameExpr identifier) {
-
             if ("url_for".equals(identifier.name)) {
                 return identifier.name;
             }
-
             if (!context.contains(identifier.name)) {
                 throw new RuntimeException(
                         "Undefined variable: "
                                 + identifier.name);
             }
-
             return context.get(identifier.name);
         }
-
         if (node instanceof TemplateBinaryExpr binary) {
             return evaluateTemplateBinary(binary);
         }
-
         if (node instanceof TemplatePrimaryExpr primary) {
             return evaluateTemplatePrimary(primary);
         }
-
         if (node instanceof TemplateJinjaBlockNode block && "for".equals(block.type)) {
             return evaluateTemplatePrimary((TemplatePrimaryExpr) block.conditionOrIterable);
         }

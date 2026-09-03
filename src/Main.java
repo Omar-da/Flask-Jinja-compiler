@@ -42,6 +42,9 @@ import ast.flask.stmt.FunctionDefNode;
 public class Main {
 
     private static final Path GENERATION_LOG = Path.of("src", "compiler_output", "generation_log.txt");
+        private static final Path SEMANTIC_REPORT = Path.of("src", "compiler_output", "semantic_report.txt");
+        private static final Path ERRORS_HANDLING_SEMANTIC_REPORT =
+            Path.of("src", "compiler_output", "errors_handling_semantic_report.txt");
 
     // ==================================================
     // Entry Point
@@ -51,9 +54,8 @@ public class Main {
         Files.createDirectories(GENERATION_LOG.getParent());
         try { Files.deleteIfExists(GENERATION_LOG); } catch (IOException ignored) {}
 
-        Path semanticReportPath = Path.of("src", "compiler_output", "semantic_report.txt");
-        Files.createDirectories(semanticReportPath.getParent());
-        Files.writeString(semanticReportPath, "", StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        Files.createDirectories(SEMANTIC_REPORT.getParent());
+        Files.writeString(SEMANTIC_REPORT, "", StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 
         // 1) Parse and build Flask AST for the app
         FlaskASTNode appAst = parseAndBuildFlaskAST("src/input/app.txt");
@@ -145,10 +147,10 @@ public class Main {
         FlaskASTNode ast = builder.visit(parser.file());
 
         if (builder.hasSemanticErrors()) {
-            writeSemanticReport(builder.getSemanticErrors());
+            writeSemanticReport(builder.getSemanticErrors(), ERRORS_HANDLING_SEMANTIC_REPORT);
             logGenerationPhase(GENERATION_LOG, "errors handling semantic report", "FOUND");
         } else {
-            writeSemanticReport(builder.getSemanticErrors());
+            writeSemanticReport(builder.getSemanticErrors(), ERRORS_HANDLING_SEMANTIC_REPORT);
             logGenerationPhase(GENERATION_LOG, "errors handling semantic report", "OK");
         }
 
@@ -528,8 +530,13 @@ public class Main {
         ParseTree parse(P parser);
     }
 
-    private static void writeSemanticReport(java.util.List<String> errors) throws IOException {
-        Path reportPath = Path.of("src/compiler_output/semantic_report.txt");
+    private static void
+    writeSemanticReport(java.util.List<String> errors) throws IOException {
+        writeSemanticReport(errors, SEMANTIC_REPORT);
+    }
+
+    private static void
+    writeSemanticReport(java.util.List<String> errors, Path reportPath) throws IOException {
         Files.createDirectories(reportPath.getParent());
 
         StringBuilder content = new StringBuilder();

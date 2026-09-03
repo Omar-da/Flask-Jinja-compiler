@@ -13,6 +13,14 @@ def show(pid):
     product = next((p for p in products if p["id"] == pid), None)
     return render_template("show.html", product = product)
 
+@app.post("/product/<int:pid>/delete")
+def delete_product(pid):
+    product = next((p for p in products if p["id"] == pid), None)
+    if product == None:
+        return redirect(url_for("index"))
+    products.remove(product)
+    return redirect(url_for("index"))
+
 @app.get("/create")
 def create():
     return render_template("create.html")

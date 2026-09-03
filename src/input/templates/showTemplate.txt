@@ -6,4 +6,8 @@
 
 <h1>{{ product.name }}</h1>
 
+<form method="POST" action="{{ url_for('delete_product', pid=product.id) }}">
+  <button type="submit">Delete Product</button>
+</form>
+
 <a href="{{ url_for('index') }}">Back</a>

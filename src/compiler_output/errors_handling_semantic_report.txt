@@ -1,0 +1,4 @@
+Semantic errors found during Flask AST build:
+- Symbol 'y' already defined in current scope (line 1, column 0)
+- Return statement is not allowed in global scope (line 3, column 0)
+- Parameter 'a' already defined in current scope (line 5, column 0)
